@@ -23,12 +23,12 @@ class CActiveMasternode;
 #define POOL_STATUS_UNKNOWN                    0 // waiting for update
 #define POOL_STATUS_IDLE                       1 // waiting for update
 #define POOL_STATUS_QUEUE                      2 // waiting in a queue
-#define POOL_STATUS_ACCEPTING_ENTRIES          3 // accepting entries, anon mode failed, this is the backup
-#define POOL_STATUS_FINALIZE_TRANSACTION       4 // master node will broadcast what it accepted
-#define POOL_STATUS_SIGNING                    5 // check inputs/outputs, sign final tx
-#define POOL_STATUS_TRANSMISSION               6 // transmit transaction
-#define POOL_STATUS_ERROR                      7 // error
-#define POOL_STATUS_SUCCESS                    8 // success
+#define POOL_STATUS_ACCEPTING_ENTRIES          3 // accepting entries
+#define POOL_STATUS_FINALIZE_TRANSACTION       5 // master node will broadcast what it accepted
+#define POOL_STATUS_SIGNING                    6 // check inputs/outputs, sign final tx
+#define POOL_STATUS_TRANSMISSION               7 // transmit transaction
+#define POOL_STATUS_ERROR                      8 // error
+#define POOL_STATUS_SUCCESS                    9 // success
 
 // status update message constants
 #define MASTERNODE_ACCEPTED                    1
@@ -37,6 +37,7 @@ class CActiveMasternode;
 
 #define DARKSEND_QUEUE_TIMEOUT                 120
 #define DARKSEND_SIGNING_TIMEOUT               30
+#define DARKSEND_DOWNGRADE_TIMEOUT             30
 
 // used for anonymous relaying of inputs/outputs/sigs
 #define DARKSEND_RELAY_IN                 1
@@ -252,7 +253,9 @@ public:
 
 void ConnectToDarkSendMasterNodeWinner();
 void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew);
-void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out);
+void RelayDarkSendSignatureAnon(CTxIn& in);
+void RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout);
+void RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout);
 void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
 void RelayDarkSendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion);
 void RelayDarkSendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop);

@@ -333,6 +333,9 @@ void ProcessMessageDarksend(CNode* pfrom, std::string& strCommand, CDataStream& 
             break;
         }
 
+        pfrom->PushMessage("dssu", darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_ACCEPTED, error);
+        darkSendPool.Check();
+
     } else if (strCommand == "dsi") { //DarkSend vIn
         std::string error = "";
         if (pfrom->nVersion < MIN_POOL_PEER_PROTO_VERSION) {
@@ -698,6 +701,7 @@ void CDarkSendPool::Check()
     if(fDebug) LogPrintf("CDarkSendPool::Check() - entries count %lu\n", entries.size());
 
     // If entries is full, then move on to the next phase
+    *** entries count
     if(state == POOL_STATUS_ACCEPTING_ENTRIES && (int)entries.size() >= GetMaxPoolTransactions())
     {
         if(fDebug) LogPrintf("CDarkSendPool::Check() -- ACCEPTING OUTPUTS\n");
@@ -1028,6 +1032,13 @@ void CDarkSendPool::CheckTimeout(){
                 break;
             }
             c++;
+        }
+
+        if(state == POOL_STATUS_ACCEPTING_ENTRIES){
+            if(GetTimeMillis()-lastTimeChanged >= DARKSEND_DOWNGRADE_TIMEOUT)){
+                lastTimeChanged = GetTimeMillis();
+                PrepareDarksendDenominate(false);
+            }
         }
 
         if(GetTimeMillis()-lastTimeChanged >= (DARKSEND_QUEUE_TIMEOUT*1000)+addLagTime){
@@ -1363,6 +1374,7 @@ void CDarkSendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
 
     if(fSubmitAnonymous) {
         // submit inputs/outputs through relays
+        RelayDarkSendInAnon(vin, vout);
 
     } else {
         // relay our entry to the master node
@@ -1492,9 +1504,15 @@ bool CDarkSendPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNod
         if(fDebug) LogPrintf("CDarkSendPool::Sign - txNew:\n%s", finalTransaction.ToString().c_str());
     }
 
-    // push all of our signatures to the masternode
-    if(sigs.size() > 0 && node != NULL)
-        node->PushMessage("dss", sigs);
+    if(fSubmitAnonymous){
+        BOOST_FOREACH(std::vector<CTxIn> s, sigs){
+            RelayDarkSendSignatureAnon(s);
+        }
+    } else {
+        // push all of our signatures to the masternode
+        if(sigs.size() > 0 && node != NULL)
+            node->PushMessage("dss", sigs);
+    }
 
     return true;
 }
@@ -2427,7 +2445,49 @@ void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNe
     }
 }
 
-void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out)
+void RelayDarkSendSignatureAnon(CTxIn& in)
+{
+    LOCK(cs_vNodes);
+
+    BOOST_FOREACH(CTxIn in, vin){
+
+    }
+
+    if(ConnectNode((CAddress)pmn->addr, NULL, true)){
+
+        LOCK(cs_vNodes);
+        BOOST_FOREACH(CNode* pnode, vNodes)
+        {
+            if((CNetAddr)pnode->addr != (CNetAddr)pmn->addr) continue;
+
+            pnode->PushMessage("dsr", stuff);
+            return;
+        }
+    }
+}
+
+void RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout)
+{
+    LOCK(cs_vNodes);
+
+    BOOST_FOREACH(CTxIn in, vin){
+
+    }
+
+    if(ConnectNode((CAddress)pmn->addr, NULL, true)){
+
+        LOCK(cs_vNodes);
+        BOOST_FOREACH(CNode* pnode, vNodes)
+        {
+            if((CNetAddr)pnode->addr != (CNetAddr)pmn->addr) continue;
+
+            pnode->PushMessage("dsr", stuff);
+            return;
+        }
+    }
+}
+
+void RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout)
 {
     LOCK(cs_vNodes);
 
@@ -2435,7 +2495,7 @@ void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const
     {
         if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pnode->addr) continue;
         LogPrintf("RelayDarkSendIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
-        pnode->PushMessage("dsi", in, nAmount, txCollateral, out);
+        pnode->PushMessage("dsi", vin, nAmount, txCollateral, vout);
     }
 }
 
