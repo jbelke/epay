@@ -247,6 +247,20 @@ public:
 };
 
 //
+// Relay Darksend Messages
+//
+
+void ConnectToDarkSendMasterNodeWinner();
+void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew);
+void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out);
+void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
+void RelayDarkSendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion);
+void RelayDarkSendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop);
+void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage);
+void RelayDarkSendMasterNodeContestant();
+
+
+//
 // Used to keep track of current status of darksend pool
 //
 class CDarkSendPool
@@ -475,9 +489,6 @@ public:
 
     int GetDenominationsByAmounts(std::vector<int64_t>& vecAmount);
 };
-
-
-void ConnectToDarkSendMasterNodeWinner();
 
 void ThreadCheckDarkSendPool();
 
