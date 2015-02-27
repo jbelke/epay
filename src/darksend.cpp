@@ -456,18 +456,6 @@ void ProcessMessageDarksend(CNode* pfrom, std::string& strCommand, CDataStream& 
         }
     }
 
-    else if (strCommand == "dssub") { //DarkSend Subscribe To
-        if (pfrom->nVersion < MIN_POOL_PEER_PROTO_VERSION) {
-            return;
-        }
-
-        if(!fMasterNode) return;
-
-        std::string error = "";
-        pfrom->PushMessage("dssu", darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET, error);
-        return;
-    }
-
     else if (strCommand == "dssu") { //DarkSend status update
 
         if (pfrom->nVersion < MIN_POOL_PEER_PROTO_VERSION) {
@@ -1014,19 +1002,6 @@ void CDarkSendPool::CheckTimeout(){
         c++;
     }
 
-    /* Check to see if we're ready for submissions from clients */
-    if(state == POOL_STATUS_QUEUE && sessionUsers == GetMaxPoolTransactions()) {
-        CDarksendQueue dsq;
-        dsq.nDenom = sessionDenom;
-        dsq.vin = activeMasternode.vin;
-        dsq.time = GetTime();
-        dsq.ready = true;
-        dsq.Sign();
-        dsq.Relay();
-
-        UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
-    }
-
     int addLagTime = 0;
     if(!fMasterNode) addLagTime = 10000; //if we're the client, give the server a few extra seconds before resetting.
 
@@ -1085,6 +1060,30 @@ void CDarkSendPool::CheckTimeout(){
 
         UpdateState(POOL_STATUS_ERROR);
         lastMessage = _("Signing timed out, please resubmit.");
+    }
+}
+
+//
+// Check for complete queue
+//
+void CDarkSendPool::CheckForCompleteQueue(){
+    if(!fEnableDarksend && !fMasterNode) return;
+    
+    /* Check to see if we're ready for submissions from clients */
+    // 
+    // After receiving multiple dsa messages, the queue will switch to "accepting entries"
+    // which is the active state right before merging the transaction
+    //
+    if(state == POOL_STATUS_QUEUE && sessionUsers == GetMaxPoolTransactions()) {
+        CDarksendQueue dsq;
+        dsq.nDenom = sessionDenom;
+        dsq.vin = activeMasternode.vin;
+        dsq.time = GetTime();
+        dsq.ready = true;
+        dsq.Sign();
+        dsq.Relay();
+
+        UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
     }
 }
 
@@ -2345,6 +2344,7 @@ void ThreadCheckDarkSendPool()
         MilliSleep(1000);
         //LogPrintf("ThreadCheckDarkSendPool::check timeout\n");
         darkSendPool.CheckTimeout();
+        darkSendPool.CheckForCompleteQueue();
 
         if(c % 60 == 0)
         {

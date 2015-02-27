@@ -426,6 +426,7 @@ public:
     // rarely charge fees to pay miners
     void ChargeRandomFees();
     void CheckTimeout();
+    void CheckForCompleteQueue();
     // check to make sure a signature matches an input in the pool
     bool SignatureValid(const CScript& newSig, const CTxIn& newVin);
     // if the collateral is valid given by a client
