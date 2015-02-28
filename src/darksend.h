@@ -11,7 +11,7 @@
 #include "masternodeman.h"
 
 class CTxIn;
-class CDarkSendPool;
+class CDarksendPool;
 class CDarkSendSigner;
 class CMasterNodeVote;
 class CBitcoinAddress;
@@ -24,11 +24,11 @@ class CActiveMasternode;
 #define POOL_STATUS_IDLE                       1 // waiting for update
 #define POOL_STATUS_QUEUE                      2 // waiting in a queue
 #define POOL_STATUS_ACCEPTING_ENTRIES          3 // accepting entries
-#define POOL_STATUS_FINALIZE_TRANSACTION       5 // master node will broadcast what it accepted
-#define POOL_STATUS_SIGNING                    6 // check inputs/outputs, sign final tx
-#define POOL_STATUS_TRANSMISSION               7 // transmit transaction
-#define POOL_STATUS_ERROR                      8 // error
-#define POOL_STATUS_SUCCESS                    9 // success
+#define POOL_STATUS_FINALIZE_TRANSACTION       4 // master node will broadcast what it accepted
+#define POOL_STATUS_SIGNING                    5 // check inputs/outputs, sign final tx
+#define POOL_STATUS_TRANSMISSION               6 // transmit transaction
+#define POOL_STATUS_ERROR                      7 // error
+#define POOL_STATUS_SUCCESS                    8 // success
 
 // status update message constants
 #define MASTERNODE_ACCEPTED                    1
@@ -46,19 +46,15 @@ class CActiveMasternode;
 
 static const int MIN_POOL_PEER_PROTO_VERSION = 70067; // minimum peer version accepted by DarkSendPool
 
-extern CDarkSendPool darkSendPool;
+extern CDarksendPool darkSendPool;
 extern CDarkSendSigner darkSendSigner;
 extern std::vector<CDarksendQueue> vecDarksendQueue;
 extern std::string strMasterNodePrivKey;
 extern map<uint256, CDarksendBroadcastTx> mapDarksendBroadcastTxes;
 extern CActiveMasternode activeMasternode;
 
-//specific messages for the Darksend protocol
-void ProcessMessageDarksend(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
-
 // get the darksend chain depth for a given input
 int GetInputDarksendRounds(CTxIn in, int rounds=0);
-
 
 // An input in the darksend pool
 class CDarkSendEntryVin
@@ -232,13 +228,19 @@ public:
     bool VerifyMessage(CPubKey pubkey, std::vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage);
 };
 
+class CTxAnonIn : CTxIn
+{
+public:
+    bool fHasSig;
+};
+
 //
 // Build a transaction anonymously
 //
 class CDSAnonTx
 {
 public:
-    std::vector<CTxIn> vin;
+    std::vector<CTxAnonIn> vin;
     std::vector<CTxOut> vout;
 
     bool IsTransactionValid();
@@ -266,7 +268,7 @@ void RelayDarkSendMasterNodeContestant();
 //
 // Used to keep track of current status of darksend pool
 //
-class CDarkSendPool
+class CDarksendPool
 {
 public:
 
@@ -278,6 +280,8 @@ public:
     CTransaction finalTransaction;
     // anonymous inputs/outputs
     CDSAnonTx anonTx;
+    bool fSubmitAnonymousFailed;
+    int nCountAttempts;
 
     int64_t lastTimeChanged;
     int64_t lastAutoDenomination;
@@ -323,7 +327,7 @@ public:
     //incremented whenever a DSQ comes through
     int64_t nDsqCount;
 
-    CDarkSendPool()
+    CDarksendPool()
     {
         /* DarkSend uses collateral addresses to trust parties entering the pool
             to behave themselves. If they don't it takes their money. */
@@ -339,7 +343,8 @@ public:
         SetNull();
     }
 
-    void ProcessMasternodeConnections();
+    //specific messages for the Darksend protocol
+    void ProcessMessageDarksend(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
 
     void InitCollateralAddress(){
         std::string strAddress = "";
@@ -398,11 +403,11 @@ public:
     void UpdateState(unsigned int newState)
     {
         if (fMasterNode && (newState == POOL_STATUS_ERROR || newState == POOL_STATUS_SUCCESS)){
-            LogPrintf("CDarkSendPool::UpdateState() - Can't set state to ERROR or SUCCESS as a masternode. \n");
+            LogPrintf("CDarksendPool::UpdateState() - Can't set state to ERROR or SUCCESS as a masternode. \n");
             return;
         }
 
-        LogPrintf("CDarkSendPool::UpdateState() == %d | %d \n", state, newState);
+        LogPrintf("CDarksendPool::UpdateState() == %d | %d \n", state, newState);
         if(state != newState){
             lastTimeChanged = GetTimeMillis();
             if(fMasterNode) {
@@ -430,7 +435,7 @@ public:
     bool IsCompatibleWithEntries(std::vector<CTxOut>& vout);
 
     // Is this amount compatible with other client in the pool?
-    bool IsCompatibleWithSession(int64_t nAmount, CTransaction txCollateral, std::string& strReason);
+    bool IsCompatibleWithSession(int64_t nAmount, CTransaction txCollateral, std::string& strReason, int nCount);
 
     // Passively run Darksend in the background according to the configuration in settings (only for QT)
     bool DoAutomaticDenominating(bool fDryRun=false, bool ready=false);

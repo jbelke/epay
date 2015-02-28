@@ -351,6 +351,22 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, in
     return -1;
 }
 
+void CMasternodeMan::ProcessMasternodeConnections()
+{
+    LOCK(cs_vNodes);
+
+    BOOST_FOREACH(CNode* pnode, vNodes)
+    {
+        //if it's in use, let it be
+        if(darkSendPool.submittedToMasternode == pnode->addr) continue;
+
+        if(pnode->fDarkSendMaster){
+            LogPrintf("Closing masternode connection %s \n", pnode->addr.ToString().c_str());
+            pnode->CloseSocketDisconnect();
+        }
+    }
+}
+
 void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
 
