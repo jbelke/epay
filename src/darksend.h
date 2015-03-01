@@ -20,6 +20,7 @@ class CDarksendBroadcastTx;
 class CActiveMasternode;
 
 #define POOL_MAX_TRANSACTIONS                  3 // wait for X transactions to merge and publish
+#define POOL_MAX_TRANSACTIONS_TESTNET          2 // wait for X transactions to merge and publish
 #define POOL_STATUS_UNKNOWN                    0 // waiting for update
 #define POOL_STATUS_IDLE                       1 // waiting for update
 #define POOL_STATUS_QUEUE                      2 // waiting in a queue
@@ -53,27 +54,37 @@ void ProcessMessageDarksend(CNode* pfrom, std::string& strCommand, CDataStream& 
 // get the darksend chain depth for a given input
 int GetInputDarksendRounds(CTxIn in, int rounds=0);
 
+<<<<<<< HEAD
 
 // An input in the darksend pool
 class CDarkSendEntryVin
+=======
+//
+// Holds an Darksend input
+//
+
+class CTxDSIn : public CTxIn
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
 {
 public:
-    bool isSigSet;
-    CTxIn vin;
+    bool fHasSig;
 
-    CDarkSendEntryVin()
+    CTxDSIn(const CTxIn& in)
     {
-        isSigSet = false;
-        vin = CTxIn();
+        prevout = in.prevout;
+        scriptSig = in.scriptSig;
+        prevPubKey = in.prevPubKey;
+        nSequence = in.nSequence;
     }
 };
+
 
 // A clients transaction in the darksend pool
 class CDarkSendEntry
 {
 public:
     bool isSet;
-    std::vector<CDarkSendEntryVin> sev;
+    std::vector<CTxIn> sev;
     int64_t amount;
     CTransaction collateral;
     std::vector<CTxOut> vout;
@@ -91,11 +102,7 @@ public:
     {
         if(isSet){return false;}
 
-        BOOST_FOREACH(const CTxIn v, vinIn) {
-            CDarkSendEntryVin s = CDarkSendEntryVin();
-            s.vin = v;
-            sev.push_back(s);
-        }
+        sev = vinIn;
         vout = voutIn;
         amount = amountIn;
         collateral = collateralIn;
@@ -103,22 +110,6 @@ public:
         addedTime = GetTime();
 
         return true;
-    }
-
-    bool AddSig(const CTxIn& vin)
-    {
-        BOOST_FOREACH(CDarkSendEntryVin& s, sev) {
-            if(s.vin.prevout == vin.prevout && s.vin.nSequence == vin.nSequence){
-                if(s.isSigSet){return false;}
-                s.vin.scriptSig = vin.scriptSig;
-                s.vin.prevPubKey = vin.prevPubKey;
-                s.isSigSet = true;
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     bool IsExpired()
@@ -139,12 +130,26 @@ public:
     bool ready; //ready for submit
     std::vector<unsigned char> vchSig;
 
+<<<<<<< HEAD
+=======
+    //information used for the anonymous relay system
+    int nBlockHeight;
+    std::vector<unsigned char> vchRelaySig;
+    std::string strSharedKey;
+
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
     CDarksendQueue()
     {
         nDenom = 0;
         vin = CTxIn();
         time = 0;
         vchSig.clear();
+<<<<<<< HEAD
+=======
+        vchRelaySig.clear();
+        nBlockHeight = 0;
+        strSharedKey = "";
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
         ready = false;
     }
 
@@ -155,6 +160,15 @@ public:
         READWRITE(time);
         READWRITE(ready);
         READWRITE(vchSig);
+<<<<<<< HEAD
+=======
+
+        if(ready){
+            READWRITE(vchRelaySig);
+            READWRITE(nBlockHeight);
+            READWRITE(strSharedKey);
+        }
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
     )
 
     bool GetAddress(CService &addr)
@@ -213,9 +227,26 @@ public:
     bool VerifyMessage(CPubKey pubkey, std::vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage);
 };
 
+<<<<<<< HEAD
 class CDarksendSession
 {
 
+=======
+//
+// Build a transaction anonymously
+//
+class CDSAnonTx
+{
+public:
+    std::vector<CTxDSIn> vin;
+    std::vector<CTxOut> vout;
+
+    bool IsTransactionValid();
+    bool AddOutput(const CTxOut out);
+    bool AddInput(const CTxIn in);
+    bool AddSig(const CTxIn in);
+    int CountEntries() {return (int)vin.size() + (int)vout.size();}
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
 };
 
 //
@@ -269,6 +300,15 @@ public:
     //debugging data
     std::string strAutoDenomResult;
 
+<<<<<<< HEAD
+=======
+    // used for securing the anonymous relay system
+    vector<unsigned char> vchMasternodeRelaySig;
+    int nMasternodeBlockHeight;
+    std::string strMasternodeSharedKey;
+    bool fResentInputsOutputs;
+
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
     //incremented whenever a DSQ comes through
     int64_t nDsqCount;
 
@@ -284,6 +324,8 @@ public:
         minBlockSpacing = 1;
         nDsqCount = 0;
         lastNewBlock = 0;
+        strMasternodeSharedKey = "";
+        fResentInputsOutputs = false;
 
         SetNull();
     }
@@ -306,6 +348,9 @@ public:
 
     bool SetCollateralAddress(std::string strAddress);
     void Reset();
+    bool Downgrade();
+    bool ResendMissingInputsOutputs();
+
     void SetNull(bool clearEverything=false);
 
     void UnlockCoins();
@@ -364,7 +409,7 @@ public:
     int GetMaxPoolTransactions()
     {
         //if we're on testnet, just use two transactions per merge
-        if(Params().NetworkID() == CChainParams::TESTNET || Params().NetworkID() == CChainParams::REGTEST) return 2;
+        if(Params().NetworkID() == CChainParams::TESTNET || Params().NetworkID() == CChainParams::REGTEST) return POOL_MAX_TRANSACTIONS_TESTNET;
 
         //use the production amount
         return POOL_MAX_TRANSACTIONS;
@@ -383,10 +428,14 @@ public:
     // Passively run Darksend in the background according to the configuration in settings (only for QT)
     bool DoAutomaticDenominating(bool fDryRun=false, bool ready=false);
     bool PrepareDarksendDenominate();
+<<<<<<< HEAD
 
+=======
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
 
     // check for process in Darksend
     void Check();
+    void CheckFinalTransaction();
     // charge fees to bad actors
     void ChargeFees();
     // rarely charge fees to pay miners
@@ -398,6 +447,21 @@ public:
     bool IsCollateralValid(const CTransaction& txCollateral);
     // add a clients entry to the pool
     bool AddEntry(const std::vector<CTxIn>& newInput, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& newOutput, std::string& error);
+<<<<<<< HEAD
+=======
+
+    // add an anonymous output/inputs/sig
+    bool AddAnonymousOutput(const CTxOut& out) {return anonTx.AddOutput(out);}
+    bool AddAnonymousInput(const CTxIn& in) {return anonTx.AddInput(in);}
+    bool AddAnonymousSig(const CTxIn& in) {return anonTx.AddSig(in);}
+    bool AddRelaySignature(vector<unsigned char> vchMasternodeRelaySigIn, int nMasternodeBlockHeightIn, std::string strSharedKey) {
+        vchMasternodeRelaySig = vchMasternodeRelaySigIn;
+        nMasternodeBlockHeight = nMasternodeBlockHeightIn;
+        strMasternodeSharedKey = strSharedKey;
+        return true;
+    }
+
+>>>>>>> 32d4fea... Masternode Blinding minor fixes
     // add signature to a vin
     bool AddScriptSig(const CTxIn& newVin);
     // are all inputs signed?
