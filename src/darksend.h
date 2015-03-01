@@ -9,6 +9,7 @@
 #include "main.h"
 #include "activemasternode.h"
 #include "masternodeman.h"
+#include "darksend-relay.h"
 
 class CTxIn;
 class CDarksendPool;
@@ -19,6 +20,7 @@ class CDarksendQueue;
 class CDarksendBroadcastTx;
 class CActiveMasternode;
 
+// pool states for mixing
 #define POOL_MAX_TRANSACTIONS                  3 // wait for X transactions to merge and publish
 #define POOL_STATUS_UNKNOWN                    0 // waiting for update
 #define POOL_STATUS_IDLE                       1 // waiting for update
@@ -237,7 +239,6 @@ class CTxAnonIn : public CTxIn
 public:
     bool fHasSig;
 
-
     CTxAnonIn(const CTxIn& in)
     {
         prevout = in.prevout;
@@ -262,20 +263,7 @@ public:
     bool AddSig(const CTxIn in);
 };
 
-//
-// Relay Darksend Messages
-//
-
 void ConnectToDarkSendMasterNodeWinner();
-void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew);
-void RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin);
-void RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout);
-void RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout);
-void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
-void RelayDarkSendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion);
-void RelayDarkSendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop);
-void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage);
-void RelayDarkSendMasterNodeContestant();
 
 
 //
@@ -314,7 +302,7 @@ public:
     std::string lastMessage;
     bool completedTransaction;
     bool unitTest;
-    CService submittedToMasternode;
+    CMasternode* pSubmittedToMasternode;
 
     int sessionID;
     int sessionDenom; //Users must submit an denom matching this
@@ -448,7 +436,7 @@ public:
     bool IsCompatibleWithEntries(std::vector<CTxOut>& vout);
 
     // Is this amount compatible with other client in the pool?
-    bool IsCompatibleWithSession(int64_t nAmount, CTransaction txCollateral, std::string& strReason, int nCount);
+    bool IsCompatibleWithSession(int64_t nAmount, CTransaction txCollateral, std::string& strReason);
 
     // Passively run Darksend in the background according to the configuration in settings (only for QT)
     bool DoAutomaticDenominating(bool fDryRun=false, bool ready=false);

@@ -95,7 +95,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             }
         }
 
-        if(!IsCompatibleWithSession(nDenom, txCollateral, error, nCount))
+        if(!IsCompatibleWithSession(nDenom, txCollateral, error))
         {
             LogPrintf("dsa -- not compatible with existing transactions! \n");
             pfrom->PushMessage("dssu", sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, error);
@@ -126,8 +126,8 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
 
         // if the queue is ready, submit if we can
         if(dsq.ready) {
-            if((CNetAddr)submittedToMasternode != (CNetAddr)addr){
-                LogPrintf("dsq - message doesn't match current masternode - %s != %s\n", submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
+            if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)addr){
+                LogPrintf("dsq - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
                 return;
             }
 
@@ -423,8 +423,8 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
-        if((CNetAddr)submittedToMasternode != (CNetAddr)pfrom->addr){
-            //LogPrintf("dssu - message doesn't match current masternode - %s != %s\n", submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
+        if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
+            //LogPrintf("dssu - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
             return;
         }
 
@@ -474,8 +474,8 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
-        if((CNetAddr)submittedToMasternode != (CNetAddr)pfrom->addr){
-            //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
+        if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
+            //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
             return;
         }
 
@@ -497,8 +497,8 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
-        if((CNetAddr)submittedToMasternode != (CNetAddr)pfrom->addr){
-            //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
+        if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
+            //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
             return;
         }
 
@@ -1740,7 +1740,7 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                             }
                         }
 
-                        submittedToMasternode = addr;
+                        pSubmittedToMasternode = mnodeman.Find(dsq.vin);
                         vecMasternodesUsed.push_back(dsq.vin);
                         sessionDenom = dsq.nDenom;
 
@@ -1805,7 +1805,7 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                         }
                     }
 
-                    submittedToMasternode = pmn->addr;
+                    pSubmittedToMasternode = pmn;
                     vecMasternodesUsed.push_back(pmn->vin);
 
                     std::vector<int64_t> vecAmounts;
@@ -2012,7 +2012,7 @@ bool CDarksendPool::IsCompatibleWithEntries(std::vector<CTxOut>& vout)
     return true;
 }
 
-bool CDarksendPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCollateral, std::string& strReason, int nCount)
+bool CDarksendPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txCollateral, std::string& strReason)
 {
     LogPrintf("CDarksendPool::IsCompatibleWithSession - sessionDenom %d sessionUsers %d\n", sessionDenom, sessionUsers);
 
@@ -2282,6 +2282,21 @@ bool CDarksendQueue::Sign()
         return false;
     }
 
+    // -- second signature, for proving access to the anonymous relay system
+
+    strMessage = boost::lexical_cast<std::string>(nBlockHeight);
+
+    if(!darkSendSigner.SignMessage(strMessage, errorMessage, vchRelaySig, key2)) {
+        LogPrintf("CDarksendQueue():Relay - Sign message failed");
+        return false;
+    }
+
+    if(!darkSendSigner.VerifyMessage(pubkey2, vchRelaySig, strMessage, errorMessage)) {
+        LogPrintf("CDarksendQueue():Relay - Verify message failed");
+        return false;
+    }
+
+
     return true;
 }
 
@@ -2308,6 +2323,15 @@ bool CDarksendQueue::CheckSignature()
         std::string errorMessage = "";
         if(!darkSendSigner.VerifyMessage(pmn->pubkey2, vchSig, strMessage, errorMessage)){
             return error("CDarksendQueue::CheckSignature() - Got bad masternode address signature %s \n", vin.ToString().c_str());
+        }
+
+        // -- second signature, for proving access to the anonymous relay system
+
+        strMessage = boost::lexical_cast<std::string>(nBlockHeight);
+
+        if(!darkSendSigner.VerifyMessage(pmn->pubkey2, vchRelaySig, strMessage, errorMessage)) {
+            LogPrintf("CDarksendQueue():CheckSignature - Verify message failed");
+            return false;
         }
 
         return true;
@@ -2443,101 +2467,3 @@ void ThreadCheckDarkSendPool()
 
 
 
-void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dsf", sessionID, txNew);
-    }
-}
-
-void RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin)
-{
-    LOCK(cs_vNodes);
-
-    BOOST_FOREACH(CTxIn in, vin){
-
-    }
-
-    if(ConnectNode((CAddress)pmn->addr, NULL, true)){
-
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-        {
-            if((CNetAddr)pnode->addr != (CNetAddr)pmn->addr) continue;
-
-            pnode->PushMessage("dsr", stuff);
-            return;
-        }
-    }
-}
-
-void RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout)
-{
-    LOCK(cs_vNodes);
-
-    BOOST_FOREACH(CTxIn in, vin){
-
-    }
-
-    if(ConnectNode((CAddress)pmn->addr, NULL, true)){
-
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-        {
-            if((CNetAddr)pnode->addr != (CNetAddr)pmn->addr) continue;
-
-            pnode->PushMessage("dsr", stuff);
-            return;
-        }
-    }
-}
-
-void RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout)
-{
-    LOCK(cs_vNodes);
-
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pnode->addr) continue;
-        LogPrintf("RelayDarkSendIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
-        pnode->PushMessage("dsi", vin, nAmount, txCollateral, vout);
-    }
-}
-
-void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dssu", sessionID, newState, newEntriesCount, newAccepted, error);
-    }
-}
-
-void RelayDarkSendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dsee", vin, addr, vchSig, nNow, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
-    }
-}
-
-void RelayDarkSendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dseep", vin, vchSig, nNow, stop);
-    }
-}
-
-void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage)
-{
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    {
-        pnode->PushMessage("dsc", sessionID, error, errorMessage);
-    }
-}

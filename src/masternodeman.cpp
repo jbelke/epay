@@ -358,7 +358,7 @@ void CMasternodeMan::ProcessMasternodeConnections()
     BOOST_FOREACH(CNode* pnode, vNodes)
     {
         //if it's in use, let it be
-        if(darkSendPool.submittedToMasternode == pnode->addr) continue;
+        if(darkSendPool.pSubmittedToMasternode->addr == pnode->addr) continue;
 
         if(pnode->fDarkSendMaster){
             LogPrintf("Closing masternode connection %s \n", pnode->addr.ToString().c_str());
