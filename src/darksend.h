@@ -228,10 +228,23 @@ public:
     bool VerifyMessage(CPubKey pubkey, std::vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage);
 };
 
-class CTxAnonIn : CTxIn
+//
+// Holds an anonymous input
+//
+
+class CTxAnonIn : public CTxIn
 {
 public:
     bool fHasSig;
+
+
+    CTxAnonIn(const CTxIn& in)
+    {
+        prevout = in.prevout;
+        scriptSig = in.scriptSig;
+        prevPubKey = in.prevPubKey;
+        nSequence = in.nSequence;
+    }
 };
 
 //
@@ -255,7 +268,7 @@ public:
 
 void ConnectToDarkSendMasterNodeWinner();
 void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew);
-void RelayDarkSendSignatureAnon(CTxIn& in);
+void RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin);
 void RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout);
 void RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout);
 void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");

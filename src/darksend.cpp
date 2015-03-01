@@ -715,8 +715,8 @@ void CDarksendPool::Check()
                         txNew.vin.push_back(s.vin);
                 }
             } else {
-                BOOST_FOREACH(CTxIn& v, anonTx.vin)
-                    txNew.vin.push_back(v);
+                BOOST_FOREACH(CTxAnonIn& v, anonTx.vin)
+                    txNew.vin.push_back((CTxIn)v);
 
                 BOOST_FOREACH(CTxOut& v, anonTx.vout)
                     txNew.vout.push_back(v);
@@ -1036,7 +1036,7 @@ void CDarksendPool::CheckTimeout(){
         }
 
         if(state == POOL_STATUS_ACCEPTING_ENTRIES){
-            if(GetTimeMillis()-lastTimeChanged >= DARKSEND_DOWNGRADE_TIMEOUT)){
+            if(GetTimeMillis()-lastTimeChanged >= DARKSEND_DOWNGRADE_TIMEOUT){
                 lastTimeChanged = GetTimeMillis();
                 PrepareDarksendDenominate(false);
                 fSubmitAnonymousFailed = true;
@@ -1050,7 +1050,6 @@ void CDarksendPool::CheckTimeout(){
             // reset session information for the queue query stage (before entering a masternode, clients will send a queue request to make sure they're compatible denomination wise)
             sessionUsers = 0;
             sessionDenom = 0;
-            sessionInputOutputCount = 0;
             sessionFoundMasternode = false;
             vecSessionCollateral.clear();
 
@@ -1077,7 +1076,8 @@ void CDarksendPool::CheckTimeout(){
             lastMessage = _("Signing timed out, please resubmit.");
         } else { //Downgrade and try again
             fSubmitAnonymousFailed = true;
-            finalTransaction.clear();
+            finalTransaction.vin.clear();
+            finalTransaction.vout.clear();
             UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
             lastMessage = _("Downgrading and trying again.");
         }
@@ -1517,9 +1517,7 @@ bool CDarksendPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNod
     }
 
     if(!fSubmitAnonymousFailed){
-        BOOST_FOREACH(std::vector<CTxIn> s, sigs){
-            RelayDarkSendSignatureAnon(s);
-        }
+        RelayDarkSendSignaturesAnon(sigs);
     } else {
         // push all of our signatures to the masternode
         if(sigs.size() > 0 && node != NULL)
@@ -1683,7 +1681,6 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
         int nUseQueue = rand()%100;
 
         sessionTotalValue = pwalletMain->GetTotalValue(vCoins);
-        int nOutputs = GenerateDarksendOutputs(int nTotalValue, std::vector<CTxOut>& vout);
 
         //randomize the amounts we mix
         if(sessionTotalValue > nBalanceNeedsAnonymized) sessionTotalValue = nBalanceNeedsAnonymized;
@@ -1747,9 +1744,8 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                         submittedToMasternode = addr;
                         vecMasternodesUsed.push_back(dsq.vin);
                         sessionDenom = dsq.nDenom;
-                        sessionInputOutputCount = vCoins.size() + nOutputs;
 
-                        pnode->PushMessage("dsa", sessionDenom, txCollateral, sessionInputOutputCount);
+                        pnode->PushMessage("dsa", sessionDenom, txCollateral);
                         LogPrintf("DoAutomaticDenominating --- connected (from queue), sending dsa for %d %d - %s\n", sessionDenom, GetDenominationsByAmount(sessionTotalValue), pnode->addr.ToString().c_str());
                         strAutoDenomResult = "";
                         return true;
@@ -1816,9 +1812,8 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                     std::vector<int64_t> vecAmounts;
                     pwalletMain->ConvertList(vCoins, vecAmounts);
                     sessionDenom = GetDenominationsByAmounts(vecAmounts);
-                    sessionInputOutputCount = vecAmounts.size() + nOutputs;
 
-                    pnode->PushMessage("dsa", sessionDenom, txCollateral, sessionInputOutputCount);
+                    pnode->PushMessage("dsa", sessionDenom, txCollateral);
                     LogPrintf("DoAutomaticDenominating --- connected, sending dsa for %d - denom %d\n", sessionDenom, GetDenominationsByAmount(sessionTotalValue));
                     strAutoDenomResult = "";
                     return true;
@@ -2033,7 +2028,6 @@ bool CDarksendPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txColla
     if(sessionUsers == 0) {
         sessionDenom = nDenom;
         sessionUsers++;
-        sessionInputOutputCount += nCount;
         lastTimeChanged = GetTimeMillis();
         entries.clear();
 
@@ -2348,7 +2342,7 @@ bool CDSAnonTx::AddInput(const CTxIn in){
 bool CDSAnonTx::AddSig(const CTxIn newIn){
     if(fDebug) LogPrintf("CDSAnonTx::AddSig -- new  %s\n", newIn.ToString().substr(0,24).c_str());
 
-    BOOST_FOREACH(CTxIn in, vin){
+    BOOST_FOREACH(CTxAnonIn& in, vin){
         if(in.prevout == newIn.prevout){
             in.scriptSig = newIn.scriptSig;
             in.fHasSig = true;
@@ -2459,7 +2453,7 @@ void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNe
     }
 }
 
-void RelayDarkSendSignatureAnon(CTxIn& in)
+void RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin)
 {
     LOCK(cs_vNodes);
 

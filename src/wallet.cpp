@@ -2237,7 +2237,6 @@ string CWallet::PrepareDarksendDenominate(int minRounds, int maxRounds, bool fSu
 
             //increment outputs and subtract denomination amount
             nOutputs++;
-            nTotalOutputs++;
             nValueLeft -= v;
         }
 
@@ -2248,7 +2247,6 @@ string CWallet::PrepareDarksendDenominate(int minRounds, int maxRounds, bool fSu
     if(vOut.size() > 40 || darkSendPool.GetDenominations(vOut) != darkSendPool.sessionDenom || nValueLeft != 0){
         vOut.clear();
         nValueLeft = nTotalValue;
-        nTotalOutputs = 0;
 
         // Make outputs by looping through denominations, from small to large
 
@@ -2265,7 +2263,6 @@ string CWallet::PrepareDarksendDenominate(int minRounds, int maxRounds, bool fSu
 
             //increment outputs and subtract denomination amount
             nValueLeft -= out.tx->vout[out.i].nValue;
-            nTotalOutputs++;
 
             if(nValueLeft == 0) break;
         }
