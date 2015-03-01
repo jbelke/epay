@@ -39,8 +39,7 @@ void ProcessMessageMasternodePayments(CNode* pfrom, std::string& strCommand, CDa
     else if (strCommand == "mnw") { //Masternode Payments Declare Winner
         //this is required in litemode
         CMasternodePaymentWinner winner;
-        int a = 0;
-        vRecv >> winner >> a;
+        vRecv >> winner;
 
         if(chainActive.Tip() == NULL) return;
 
@@ -440,10 +439,9 @@ void CMasternodePayments::Relay(CMasternodePaymentWinner& winner)
 
 void CMasternodePayments::Sync(CNode* node)
 {
-    int a = 0;
     BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning)
         if(winner.nBlockHeight >= chainActive.Tip()->nHeight-10 && winner.nBlockHeight <= chainActive.Tip()->nHeight + 20)
-            node->PushMessage("mnw", winner, a);
+            node->PushMessage("mnw", winner);
 }
 
 

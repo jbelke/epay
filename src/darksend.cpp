@@ -74,8 +74,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
 
         int nDenom;
         CTransaction txCollateral;
-        int nCount;
-        vRecv >> nDenom >> txCollateral >> nCount;
+        vRecv >> nDenom >> txCollateral;
 
         std::string error = "";
         CMasternode* pmn = mnodeman.Find(activeMasternode.vin);
