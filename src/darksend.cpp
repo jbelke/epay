@@ -2344,24 +2344,29 @@ void CDarksendPool::RelayFinalTransaction(const int sessionID, const CTransactio
     }
 }
 
-void CDarksendPool::RelaySignaturesAnon(const std::vector<CTxIn>& vin)
+void CDarksendPool::RelaySignaturesAnon(std::vector<CTxIn>& vin)
 {
-    LOCK(cs_vNodes);
-
-    /*BOOST_FOREACH(CTxIn in, vin){
-        CDarkSendRelay r(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_SIG, in, CTxOut());
-        r.Relay(2);
-    }*/
+    CTxOut out;
+    BOOST_FOREACH(CTxIn& in, vin){
+        CDarkSendRelay dsr(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_SIG, in, out);
+        dsr.Relay();
+    }
 }
 
-void CDarksendPool::RelayInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout)
+void CDarksendPool::RelayInAnon(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout)
 {
-    LOCK(cs_vNodes);
+    CTxOut out;
+    CTxIn in;
 
-    BOOST_FOREACH(CTxIn in, vin){
-
+    BOOST_FOREACH(CTxIn& in, vin){
+        CDarkSendRelay dsr(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_IN, in, out);
+        dsr.Relay();
     }
 
+    BOOST_FOREACH(CTxOut& out, vout){
+        CDarkSendRelay dsr(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_OUT, in, out);
+        dsr.Relay();
+    }
 }
 
 void CDarksendPool::RelayIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout)

@@ -1,12 +1,12 @@
 
 #include "darksend-relay.h"
 
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/lexical_cast.hpp>
-
-#include <algorithm>
-#include <boost/assign/list_of.hpp>
-
-
+CDarkSendRelay::CDarkSendRelay(CTxIn& vinMasternodeIn, vector<unsigned char>& vchSigIn, int nBlockHeightIn, int nRelayTypeIn, CTxIn& in2, CTxOut& out2)
+{
+    vinMasternode = vinMasternodeIn;
+    vchSig = vchSigIn;
+    nBlockHeight = nBlockHeightIn;
+    nRelayType = nRelayTypeIn;
+    in = in2;
+    out = out2;
+}

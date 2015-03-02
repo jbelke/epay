@@ -129,24 +129,24 @@ public:
         // * version byte (currently 0)
         // * all fields (?)
         {
-                LOCK(cs);
-                unsigned char nVersion = 0;
-                READWRITE(nVersion);
-                READWRITE(vin);
-                READWRITE(addr);
-                READWRITE(pubkey);
-                READWRITE(pubkey2);
-                READWRITE(sig);
-                READWRITE(activeState);
-                READWRITE(now);
-                READWRITE(lastDseep);
-                READWRITE(lastTimeSeen);
-                READWRITE(cacheInputAge);
-                READWRITE(cacheInputAgeBlock);
-                READWRITE(unitTest);
-                READWRITE(allowFreeTx);
-                READWRITE(protocolVersion);
-                READWRITE(nLastDsq);
+            LOCK(cs);
+            unsigned char nVersion = 0;
+            READWRITE(nVersion);
+            READWRITE(vin);
+            READWRITE(addr);
+            READWRITE(pubkey);
+            READWRITE(pubkey2);
+            READWRITE(sig);
+            READWRITE(activeState);
+            READWRITE(now);
+            READWRITE(lastDseep);
+            READWRITE(lastTimeSeen);
+            READWRITE(cacheInputAge);
+            READWRITE(cacheInputAgeBlock);
+            READWRITE(unitTest);
+            READWRITE(allowFreeTx);
+            READWRITE(protocolVersion);
+            READWRITE(nLastDsq);
         }
     )
 
