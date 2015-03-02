@@ -2335,7 +2335,7 @@ bool CDarksendQueue::CheckSignature()
 }
 
 
-void CDarksendPool::RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew)
+void CDarksendPool::RelayFinalTransaction(const int sessionID, const CTransaction& txNew)
 {
     LOCK(cs_vNodes);
     BOOST_FOREACH(CNode* pnode, vNodes)
@@ -2344,7 +2344,7 @@ void CDarksendPool::RelayDarkSendFinalTransaction(const int sessionID, const CTr
     }
 }
 
-void CDarksendPool::RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin)
+void CDarksendPool::RelaySignaturesAnon(const std::vector<CTxIn>& vin)
 {
     LOCK(cs_vNodes);
 
@@ -2354,7 +2354,7 @@ void CDarksendPool::RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin)
     }*/
 }
 
-void CDarksendPool::RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout)
+void CDarksendPool::RelayInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout)
 {
     LOCK(cs_vNodes);
 
@@ -2364,26 +2364,26 @@ void CDarksendPool::RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std
 
 }
 
-void CDarksendPool::RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout)
+void CDarksendPool::RelayIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout)
 {
     LOCK(cs_vNodes);
 
     BOOST_FOREACH(CNode* pnode, vNodes)
     {
         if((CNetAddr)darkSendPool.pSubmittedToMasternode->addr != (CNetAddr)pnode->addr) continue;
-        LogPrintf("RelayDarkSendIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
+        LogPrintf("RelayIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
         pnode->PushMessage("dsi", vin, nAmount, txCollateral, vout);
     }
 }
 
-void CDarksendPool::RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error)
+void CDarksendPool::RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error)
 {
     LOCK(cs_vNodes);
     BOOST_FOREACH(CNode* pnode, vNodes)
         pnode->PushMessage("dssu", sessionID, newState, newEntriesCount, newAccepted, error);
 }
 
-void CDarksendPool::RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage)
+void CDarksendPool::RelayCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage)
 {
     LOCK(cs_vNodes);
     BOOST_FOREACH(CNode* pnode, vNodes)

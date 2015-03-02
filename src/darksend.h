@@ -503,13 +503,12 @@ public:
     // Relay Darksend Messages
     //
 
-    void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew);
-    void RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin);
-    void RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout);
-    void RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout);
-    void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
-    void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage);
-    void RelayDarkSendMasterNodeContestant();
+    void RelayFinalTransaction(const int sessionID, const CTransaction& txNew);
+    void RelaySignaturesAnon(const std::vector<CTxIn>& vin);
+    void RelayInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout);
+    void RelayIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout);
+    void RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
+    void RelayCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage);
 };
 
 void ThreadCheckDarkSendPool();
