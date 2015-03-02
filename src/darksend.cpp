@@ -197,7 +197,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
-        int a = mnodeman.GetMasternodeRank(activeMasternode.vin, nBlockHeight);
+        int a = mnodeman.GetMasternodeRank(activeMasternode.vin, nBlockHeight, MIN_POOL_PEER_PROTO_VERSION);
 
         if(a > 20){
             LogPrintf("dsr -- unknown/invalid masternode! %s \n", activeMasternode.vin.ToString().c_str());
@@ -215,13 +215,10 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
 
         //connect and deliver the message
         if(ConnectNode((CAddress)pmn->addr, NULL, true)){
-
-            LOCK(cs_vNodes);
-            BOOST_FOREACH(CNode* pnode, vNodes)
+            CNode* pNode = FindNode(pmn->addr);
+            if(pNode)
             {
-                if((CNetAddr)pnode->addr != (CNetAddr)pmn->addr) continue;
-
-                pnode->PushMessage("dsai", vinMasternode, vchSig, nBlockHeight, nRelayType, in, out);
+                pNode->PushMessage("dsai", vinMasternode, vchSig, nBlockHeight, nRelayType, in, out);
                 return;
             }
         }
@@ -1726,12 +1723,9 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
 
                 // connect to masternode and submit the queue request
                 if(ConnectNode((CAddress)addr, NULL, true)){
-
-                    LOCK(cs_vNodes);
-                    BOOST_FOREACH(CNode* pnode, vNodes)
+                    CNode* pNode = FindNode(addr);
+                    if(pNode)
                     {
-                        if((CNetAddr)pnode->addr != (CNetAddr)addr) continue;
-
                         std::string strReason;
                         if(txCollateral == CTransaction()){
                             if(!pwalletMain->CreateCollateralTransaction(txCollateral, strReason)){
@@ -1744,8 +1738,8 @@ bool CDarksendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                         vecMasternodesUsed.push_back(dsq.vin);
                         sessionDenom = dsq.nDenom;
 
-                        pnode->PushMessage("dsa", sessionDenom, txCollateral);
-                        LogPrintf("DoAutomaticDenominating --- connected (from queue), sending dsa for %d %d - %s\n", sessionDenom, GetDenominationsByAmount(sessionTotalValue), pnode->addr.ToString().c_str());
+                        pNode->PushMessage("dsa", sessionDenom, txCollateral);
+                        LogPrintf("DoAutomaticDenominating --- connected (from queue), sending dsa for %d %d - %s\n", sessionDenom, GetDenominationsByAmount(sessionTotalValue), pNode->addr.ToString().c_str());
                         strAutoDenomResult = "";
                         return true;
                     }
@@ -2338,6 +2332,62 @@ bool CDarksendQueue::CheckSignature()
     }
 
     return false;
+}
+
+
+void CDarksendPool::RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+    {
+        pnode->PushMessage("dsf", sessionID, txNew);
+    }
+}
+
+void CDarksendPool::RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin)
+{
+    LOCK(cs_vNodes);
+
+    /*BOOST_FOREACH(CTxIn in, vin){
+        CDarkSendRelay r(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_SIG, in, CTxOut());
+        r.Relay(2);
+    }*/
+}
+
+void CDarksendPool::RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout)
+{
+    LOCK(cs_vNodes);
+
+    BOOST_FOREACH(CTxIn in, vin){
+
+    }
+
+}
+
+void CDarksendPool::RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout)
+{
+    LOCK(cs_vNodes);
+
+    BOOST_FOREACH(CNode* pnode, vNodes)
+    {
+        if((CNetAddr)darkSendPool.pSubmittedToMasternode->addr != (CNetAddr)pnode->addr) continue;
+        LogPrintf("RelayDarkSendIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
+        pnode->PushMessage("dsi", vin, nAmount, txCollateral, vout);
+    }
+}
+
+void CDarksendPool::RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+        pnode->PushMessage("dssu", sessionID, newState, newEntriesCount, newAccepted, error);
+}
+
+void CDarksendPool::RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+        pnode->PushMessage("dsc", sessionID, error, errorMessage);
 }
 
 bool CDSAnonTx::AddOutput(const CTxOut out){

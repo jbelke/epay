@@ -46,8 +46,6 @@ class CActiveMasternode;
 #define DARKSEND_RELAY_OUT                2
 #define DARKSEND_RELAY_SIG                3
 
-static const int MIN_POOL_PEER_PROTO_VERSION = 70067; // minimum peer version accepted by DarkSendPool
-
 extern CDarksendPool darkSendPool;
 extern CDarkSendSigner darkSendSigner;
 extern std::vector<CDarksendQueue> vecDarksendQueue;
@@ -487,16 +485,31 @@ public:
     void ClearLastMessage();
     // used for liquidity providers
     bool SendRandomPaymentToSelf();
+    
     // split up large inputs or make fee sized inputs
     bool MakeCollateralAmounts();
     bool CreateDenominated(int64_t nTotalValue);
+    
     // get the denominations for a list of outputs (returns a bitshifted integer)
     int GetDenominations(const std::vector<CTxOut>& vout);
     void GetDenominationsToString(int nDenom, std::string& strDenom);
+
     // get the denominations for a specific amount of darkcoin.
     int GetDenominationsByAmount(int64_t nAmount, int nDenomTarget=0);
-
     int GetDenominationsByAmounts(std::vector<int64_t>& vecAmount);
+
+
+    //
+    // Relay Darksend Messages
+    //
+
+    void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew);
+    void RelayDarkSendSignaturesAnon(const std::vector<CTxIn>& vin);
+    void RelayDarkSendInAnon(const std::vector<CTxIn>& vin, const std::vector<CTxOut>& vout);
+    void RelayDarkSendIn(const std::vector<CTxIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& vout);
+    void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
+    void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage);
+    void RelayDarkSendMasterNodeContestant();
 };
 
 void ThreadCheckDarkSendPool();

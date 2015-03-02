@@ -217,8 +217,8 @@ bool CActiveMasternode::Dseep(CTxIn vin, CService service, CKey keyMasternode, C
     }
 
     //send to all peers
-    LogPrintf("CActiveMasternode::Dseep() - RelayDarkSendElectionEntryPing vin = %s\n", vin.ToString().c_str());
-    RelayDarkSendElectionEntryPing(vin, vchMasterNodeSignature, masterNodeSignatureTime, stop);
+    LogPrintf("CActiveMasternode::Dseep() - RelayMasternodeEntryPing vin = %s\n", vin.ToString().c_str());
+    mnodeman.RelayMasternodeEntryPing(vin, vchMasterNodeSignature, masterNodeSignatureTime, stop);
 
     return true;
 }
@@ -278,7 +278,7 @@ bool CActiveMasternode::Register(CTxIn vin, CService service, CKey keyCollateral
 
     //send to all peers
     LogPrintf("CActiveMasternode::Register() - RelayDarkSendElectionEntry vin = %s\n", vin.ToString().c_str());
-    RelayDarkSendElectionEntry(vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION);
+    mnodeman.RelayMasternodeEntry(vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION);
 
     return true;
 }
