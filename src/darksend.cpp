@@ -2,10 +2,6 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#if defined(HAVE_CONFIG_H)
-#include "darkcoin-config.h"
-#endif
-
 #include "darksend.h"
 #include "main.h"
 #include "init.h"
@@ -126,8 +122,9 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
 
         // if the queue is ready, submit if we can
         if(dsq.ready) {
+            if(!pSubmittedToMasternode) return;
             if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)addr){
-                LogPrintf("dsq - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
+                LogPrintf("dsq - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), addr.ToString().c_str());
                 return;
             }
 
@@ -177,9 +174,12 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
         vRecv >> dsr;
 
         if(chainActive.Tip()->nHeight - dsr.nBlockHeight > 10) return;
+        
         if(dsr.nRelayType != DARKSEND_RELAY_IN &&
             dsr.nRelayType != DARKSEND_RELAY_OUT &&
             dsr.nRelayType != DARKSEND_RELAY_SIG) return;
+
+    
         if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_IN) return;
         if(dsr.out == CTxOut() && dsr.nRelayType == DARKSEND_RELAY_OUT) return;
         if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_SIG) return;
@@ -200,7 +200,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
         //check the signature from the target masternode
         std::string strMessage = boost::lexical_cast<std::string>(dsr.nBlockHeight);
         std::string errorMessage = "";
-        if(!darkSendSigner.VerifyMessage(pmn->pubkey, dsr.vchSig, strMessage, errorMessage)){
+        if(!darkSendSigner.VerifyMessage(pmn->pubkey2, dsr.vchSig, strMessage, errorMessage)){
             LogPrintf("dsr - Got bad masternode address signature\n");
             Misbehaving(pfrom->GetId(), 100);
             return;
@@ -211,6 +211,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             CNode* pNode = FindNode(pmn->addr);
             if(pNode)
             {
+                printf("dsr 8\n");
                 pNode->PushMessage("dsai", dsr);
                 return;
             }
@@ -236,7 +237,6 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
         if(dsr.nRelayType != DARKSEND_RELAY_IN &&
             dsr.nRelayType != DARKSEND_RELAY_OUT &&
             dsr.nRelayType != DARKSEND_RELAY_SIG) return;
-
         if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_IN) return;
         if(dsr.out == CTxOut() && dsr.nRelayType == DARKSEND_RELAY_OUT) return;
         if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_SIG) return;
@@ -250,7 +250,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
         //check the signature from the target masternode
         std::string strMessage = boost::lexical_cast<std::string>(dsr.nBlockHeight);
         std::string errorMessage = "";
-        if(!darkSendSigner.VerifyMessage(pmn->pubkey, dsr.vchSig, strMessage, errorMessage)){
+        if(!darkSendSigner.VerifyMessage(pmn->pubkey2, dsr.vchSig, strMessage, errorMessage)){
             LogPrintf("dsr - Got bad masternode address signature\n");
             Misbehaving(pfrom->GetId(), 100);
             return;
@@ -258,10 +258,11 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
 
         //do we have enough users in the current session?
         if(!IsSessionReady()){
-            LogPrintf("dsi -- session not complete! \n");
+            LogPrintf("dsai -- session not complete! \n");
             return;
         }
 
+        printf("dsai -- 10 -- dsr.nRelayType %d\n", dsr.nRelayType);
         switch(dsr.nRelayType){
         case DARKSEND_RELAY_IN:
             anonTx.AddInput(dsr.in);
@@ -270,6 +271,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             anonTx.AddOutput(dsr.out);
             break;
         case DARKSEND_RELAY_SIG:
+            printf("dsai 11\n");
             anonTx.AddSig(dsr.in);
             break;
         }
@@ -406,6 +408,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
+        if(!pSubmittedToMasternode) return;
         if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
             //LogPrintf("dssu - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
             return;
@@ -457,6 +460,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
+        if(!pSubmittedToMasternode) return;
         if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
             //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
             return;
@@ -480,6 +484,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
+        if(!pSubmittedToMasternode) return;
         if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
             //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
             return;
@@ -668,19 +673,21 @@ void CDarksendPool::Check()
     if(fDebug) LogPrintf("CDarksendPool::Check()\n");
     if(fDebug) LogPrintf("CDarksendPool::Check() - entries count %lu\n", entries.size());
 
+    printf("CDarksendPool::Check() %d - %d - %d\n", state, anonTx.CountEntries(), GetTimeMillis()-lastTimeChanged);
     // If entries is full, then move on to the next phase
     if(state == POOL_STATUS_ACCEPTING_ENTRIES && (
         (int)entries.size() >= GetMaxPoolTransactions() || 
-        GetTimeMillis()-lastTimeChanged > 5000
+        (GetTimeMillis()-lastTimeChanged > 5000 && anonTx.CountEntries() > GetMaxPoolTransactions()*5)
         ))
     {
-        if(fDebug) LogPrintf("CDarksendPool::Check() -- ACCEPTING OUTPUTS\n");
+        if(fDebug) LogPrintf("CDarksendPool::Check() -- TRYING TRANSACTION \n");
         UpdateState(POOL_STATUS_FINALIZE_TRANSACTION);
         nCountAttempts++;
+        printf("Check 1\n");
     }
 
     // create the finalized transaction for distribution to the clients
-    if(state == POOL_STATUS_FINALIZE_TRANSACTION && finalTransaction.vin.empty() && finalTransaction.vout.empty()) {
+    if(state == POOL_STATUS_FINALIZE_TRANSACTION) {
         if(fDebug) LogPrintf("CDarksendPool::Check() -- FINALIZE TRANSACTIONS\n");
         UpdateState(POOL_STATUS_SIGNING);
 
@@ -696,26 +703,34 @@ void CDarksendPool::Check()
                     BOOST_FOREACH(const CDarkSendEntryVin s, entries[i].sev)
                         txNew.vin.push_back(s.vin);
                 }
+
+                // shuffle the outputs for improved anonymity
+                std::random_shuffle ( txNew.vout.begin(), txNew.vout.end(), randomizeList);
             } else {
+                printf("Check 3\n");
+
                 BOOST_FOREACH(CTxAnonIn& v, anonTx.vin)
                     txNew.vin.push_back((CTxIn)v);
 
                 BOOST_FOREACH(CTxOut& v, anonTx.vout)
                     txNew.vout.push_back(v);
+
+                //CDSAnonTx sorts vout
             }
-            
 
-            // shuffle the outputs for improved anonymity
-            std::random_shuffle ( txNew.vout.begin(), txNew.vout.end(), randomizeList);
+            bool fIsNew = ((int)txNew.vin.size()+(int)txNew.vout.size() > (int)finalTransaction.vin.size()+(int)finalTransaction.vout.size());
 
-            if(fDebug) LogPrintf("Transaction 1: %s\n", txNew.ToString().c_str());
-
+            printf("Transaction 1: %s\n", txNew.ToString().c_str());
             SignFinalTransaction(txNew, NULL);
-
-            // request signatures from clients
-            RelayFinalTransaction(sessionID, txNew);
+            
+            if(fIsNew){
+                // request signatures from clients
+                RelayFinalTransaction(sessionID, finalTransaction);
+            }
         }
     }
+
+    //printf("Signing Status %d %d\n", state == POOL_STATUS_SIGNING, SignaturesComplete());
 
     // If we have all of the signatures, try to compile the transaction
     if(state == POOL_STATUS_SIGNING && SignaturesComplete()) {
@@ -732,15 +747,18 @@ void CDarksendPool::Check()
                 // See if the transaction is valid
                 if (!txNew.AcceptToMemoryPool(true))
                 {
-                    LogPrintf("CDarksendPool::Check() - CommitTransaction : Error: Transaction not valid\n");
-                    SetNull();
-                    pwalletMain->Lock();
+                    if(nCountAttempts > 10) {
+                        LogPrintf("CDarksendPool::Check() - CommitTransaction : Error: Transaction not valid\n");
+                        SetNull();
+                        pwalletMain->Lock();
+                    }
 
                     // not much we can do in this case
+                    printf("POOL_STATUS_ACCEPTING_ENTRIES 1\n");
                     UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
                     RelayCompletedTransaction(sessionID, true, "Transaction not valid, please try again");
 
-                    if(!fSubmitAnonymousFailed) 
+                    if(!fSubmitAnonymousFailed && nCountAttempts > 5) 
                         fSubmitAnonymousFailed = true;
                     return;
                 }
@@ -1017,8 +1035,8 @@ void CDarksendPool::CheckTimeout(){
             c++;
         }
 
-        if(state == POOL_STATUS_ACCEPTING_ENTRIES){
-            if(GetTimeMillis()-lastTimeChanged >= DARKSEND_DOWNGRADE_TIMEOUT){
+        if(!fMasterNode && state == POOL_STATUS_ACCEPTING_ENTRIES){
+            if(GetTimeMillis()-lastTimeChanged >= (DARKSEND_DOWNGRADE_TIMEOUT*1000)+addLagTime){
                 lastTimeChanged = GetTimeMillis();
                 PrepareDarksendDenominate(false);
                 fSubmitAnonymousFailed = true;
@@ -1035,6 +1053,7 @@ void CDarksendPool::CheckTimeout(){
             sessionFoundMasternode = false;
             vecSessionCollateral.clear();
 
+            printf("POOL_STATUS_ACCEPTING_ENTRIES 2\n");
             UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
         }
     } else if(GetTimeMillis()-lastTimeChanged >= (DARKSEND_QUEUE_TIMEOUT*1000)+addLagTime){
@@ -1078,6 +1097,7 @@ void CDarksendPool::CheckForCompleteQueue(){
     // which is the active state right before merging the transaction
     //
     if(state == POOL_STATUS_QUEUE && sessionUsers == GetMaxPoolTransactions()) {
+        printf("POOL_STATUS_ACCEPTING_ENTRIES 3\n");
         UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
 
         CDarksendQueue dsq;
@@ -1336,6 +1356,7 @@ void CDarksendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
         return;
     }
 
+    printf("POOL_STATUS_ACCEPTING_ENTRIES 4\n");
     UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
 
     LogPrintf("CDarksendPool::SendDarksendDenominate() - Added transaction to pool.\n");
@@ -1360,6 +1381,8 @@ void CDarksendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
             if(fDebug) LogPrintf("dsi -- tx in %s\n", i.ToString().c_str());
         }
 
+        printf("Submitting tx %s\n", tx.ToString().c_str());
+
         if(!AcceptableInputs(mempool, state, tx)){
             LogPrintf("dsi -- transaction not valid! %s \n", tx.ToString().c_str());
             return;
@@ -1372,13 +1395,15 @@ void CDarksendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
     myEntries.push_back(e);
 
     if(fSubmitAnonymous) {
+        printf("RelayInAnon\n");
         // submit inputs/outputs through relays
         RelayInAnon(vin, vout);
-
     } else {
+        printf("RelayIn\n");
         // relay our entry to the master node
         RelayIn(vin, amount, txCollateral, vout);
     }
+
     Check();
 }
 
@@ -1420,6 +1445,7 @@ bool CDarksendPool::StatusUpdate(int newState, int newEntriesCount, int newAccep
         } else if (newAccepted == 0 && sessionID == 0 && !sessionFoundMasternode) {
             LogPrintf("CDarksendPool::StatusUpdate - entry not accepted by masternode \n");
             UnlockCoins();
+            printf("POOL_STATUS_ACCEPTING_ENTRIES 5\n");
             UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
             DoAutomaticDenominating(); //try another masternode
         }
@@ -2264,12 +2290,15 @@ bool CDarksendQueue::Sign()
 
     // -- second signature, for proving access to the anonymous relay system
 
+    nBlockHeight = chainActive.Tip()->nHeight; //sign with our current blockheight
     strMessage = boost::lexical_cast<std::string>(nBlockHeight);
 
     if(!darkSendSigner.SignMessage(strMessage, errorMessage, vchRelaySig, key2)) {
         LogPrintf("CDarksendQueue():Relay - Sign message failed");
         return false;
     }
+
+    printf("Sign Relay %d \n", (int)vchRelaySig.size());
 
     if(!darkSendSigner.VerifyMessage(pubkey2, vchRelaySig, strMessage, errorMessage)) {
         LogPrintf("CDarksendQueue():Relay - Verify message failed");
@@ -2336,6 +2365,7 @@ void CDarksendPool::RelaySignaturesAnon(std::vector<CTxIn>& vin)
     CTxOut out;
 
     BOOST_FOREACH(CTxIn& in, vin){
+        printf("RelaySignaturesAnon %s\n", in.ToString().c_str());
         CDarkSendRelay dsr(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_SIG, in, out);
         dsr.Relay();
     }
@@ -2348,11 +2378,13 @@ void CDarksendPool::RelayInAnon(std::vector<CTxIn>& vin, std::vector<CTxOut>& vo
     CTxIn in;
 
     BOOST_FOREACH(CTxIn& in, vin){
+        printf("RelayInAnon - in %s\n", in.ToString().c_str());
         CDarkSendRelay dsr(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_IN, in, out);
         dsr.Relay();
     }
 
     BOOST_FOREACH(CTxOut& out, vout){
+        printf("RelayInAnon - out %s\n", out.ToString().c_str());
         CDarkSendRelay dsr(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_OUT, in, out);
         dsr.Relay();
     }
@@ -2364,6 +2396,7 @@ void CDarksendPool::RelayIn(const std::vector<CTxIn>& vin, const int64_t& nAmoun
 
     BOOST_FOREACH(CNode* pnode, vNodes)
     {
+        if(!pSubmittedToMasternode) return;
         if((CNetAddr)darkSendPool.pSubmittedToMasternode->addr != (CNetAddr)pnode->addr) continue;
         LogPrintf("RelayIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
         pnode->PushMessage("dsi", vin, nAmount, txCollateral, vout);
@@ -2391,6 +2424,7 @@ bool CDSAnonTx::AddOutput(const CTxOut out){
     if(std::find(vout.begin(), vout.end(), out) != vout.end()) return false;
 
     vout.push_back(out);
+    std::random_shuffle ( vout.begin(), vout.end(), randomizeList);
 
     return true;
 }
@@ -2410,12 +2444,16 @@ bool CDSAnonTx::AddSig(const CTxIn newIn){
     if(fDebug) LogPrintf("CDSAnonTx::AddSig -- new  %s\n", newIn.ToString().substr(0,24).c_str());
 
     BOOST_FOREACH(CTxAnonIn& in, vin){
-        if(in.prevout == newIn.prevout){
+        if(newIn.prevout == in.prevout && in.nSequence == newIn.nSequence){
             in.scriptSig = newIn.scriptSig;
+            in.prevPubKey = newIn.prevPubKey;
             in.fHasSig = true;
+            printf("signed sig %s\n", in.scriptSig.ToString().c_str());
             return true;
         }
     }
+
+    printf("signed sig\n");
     return false;
 }
 
@@ -2436,6 +2474,8 @@ void ThreadCheckDarkSendPool()
 
         MilliSleep(1000);
         //LogPrintf("ThreadCheckDarkSendPool::check timeout\n");
+        
+        if(c % 10 == 0) darkSendPool.Check();
         darkSendPool.CheckTimeout();
         darkSendPool.CheckForCompleteQueue();
 

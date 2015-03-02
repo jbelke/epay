@@ -402,9 +402,10 @@ void CMasternodeMan::ProcessMasternodeConnections()
 {
     LOCK(cs_vNodes);
 
+    if(!darkSendPool.pSubmittedToMasternode) return;
+    
     BOOST_FOREACH(CNode* pnode, vNodes)
     {
-        //if it's in use, let it be
         if(darkSendPool.pSubmittedToMasternode->addr == pnode->addr) continue;
 
         if(pnode->fDarkSendMaster){

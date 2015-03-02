@@ -22,6 +22,7 @@ class CActiveMasternode;
 
 // pool states for mixing
 #define POOL_MAX_TRANSACTIONS                  3 // wait for X transactions to merge and publish
+#define POOL_MAX_TRANSACTIONS_TESTNET          1 // wait for X transactions to merge and publish
 #define POOL_STATUS_UNKNOWN                    0 // waiting for update
 #define POOL_STATUS_IDLE                       1 // waiting for update
 #define POOL_STATUS_QUEUE                      2 // waiting in a queue
@@ -259,6 +260,7 @@ public:
     bool AddOutput(const CTxOut out);
     bool AddInput(const CTxIn in);
     bool AddSig(const CTxIn in);
+    int CountEntries() {return (int)vin.size() + (int)vout.size();}
 };
 
 void ConnectToDarkSendMasterNodeWinner();
@@ -419,7 +421,7 @@ public:
     int GetMaxPoolTransactions()
     {
         //if we're on testnet, just use two transactions per merge
-        if(Params().NetworkID() == CChainParams::TESTNET || Params().NetworkID() == CChainParams::REGTEST) return 2;
+        if(Params().NetworkID() == CChainParams::TESTNET || Params().NetworkID() == CChainParams::REGTEST) return POOL_MAX_TRANSACTIONS_TESTNET;
 
         //use the production amount
         return POOL_MAX_TRANSACTIONS;
@@ -462,6 +464,8 @@ public:
     bool AddRelaySignature(vector<unsigned char> vchMasternodeRelaySigIn, int nMasternodeBlockHeightIn) {
         vchMasternodeRelaySig = vchMasternodeRelaySigIn;
         nMasternodeBlockHeight = nMasternodeBlockHeightIn;
+        
+        printf("AddRelaySignature %d %d \n", (int)vchMasternodeRelaySig.size(), nMasternodeBlockHeight);
         return true;
     }
 
