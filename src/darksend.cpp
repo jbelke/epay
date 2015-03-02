@@ -173,31 +173,24 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
-        CTxIn vinMasternode;
-        vector<unsigned char> vchSig;
-        int nBlockHeight;
-        int nRelayType;
-        CTxIn in;
-        CTxOut out;
+        CDarkSendRelay dsr;
+        vRecv >> dsr;
 
-        vRecv >> vinMasternode >> vchSig >> nBlockHeight >> nRelayType >> in >> out;
+        if(chainActive.Tip()->nHeight - dsr.nBlockHeight > 10) return;
+        if(dsr.nRelayType != DARKSEND_RELAY_IN &&
+            dsr.nRelayType != DARKSEND_RELAY_OUT &&
+            dsr.nRelayType != DARKSEND_RELAY_SIG) return;
+        if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_IN) return;
+        if(dsr.out == CTxOut() && dsr.nRelayType == DARKSEND_RELAY_OUT) return;
+        if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_SIG) return;
 
-        if(chainActive.Tip()->nHeight - nBlockHeight > 10) return;
-        if(nRelayType != DARKSEND_RELAY_IN &&
-            nRelayType != DARKSEND_RELAY_OUT &&
-            nRelayType != DARKSEND_RELAY_SIG) return;
-        if(in == CTxIn() && nRelayType == DARKSEND_RELAY_IN) return;
-        if(out == CTxOut() && nRelayType == DARKSEND_RELAY_OUT) return;
-        if(in == CTxIn() && nRelayType == DARKSEND_RELAY_SIG) return;
-
-
-        CMasternode* pmn = mnodeman.Find(vinMasternode);
+        CMasternode* pmn = mnodeman.Find(dsr.vinMasternode);
         if(!pmn){
-            LogPrintf("dsr -- unknown masternode! %s \n", vinMasternode.ToString().c_str());
+            LogPrintf("dsr -- unknown masternode! %s \n", dsr.vinMasternode.ToString().c_str());
             return;
         }
 
-        int a = mnodeman.GetMasternodeRank(activeMasternode.vin, nBlockHeight, MIN_POOL_PEER_PROTO_VERSION);
+        int a = mnodeman.GetMasternodeRank(activeMasternode.vin, dsr.nBlockHeight, MIN_POOL_PEER_PROTO_VERSION);
 
         if(a > 20){
             LogPrintf("dsr -- unknown/invalid masternode! %s \n", activeMasternode.vin.ToString().c_str());
@@ -205,9 +198,9 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
         }
 
         //check the signature from the target masternode
-        std::string strMessage = boost::lexical_cast<std::string>(nBlockHeight);
+        std::string strMessage = boost::lexical_cast<std::string>(dsr.nBlockHeight);
         std::string errorMessage = "";
-        if(!darkSendSigner.VerifyMessage(pmn->pubkey, vchSig, strMessage, errorMessage)){
+        if(!darkSendSigner.VerifyMessage(pmn->pubkey, dsr.vchSig, strMessage, errorMessage)){
             LogPrintf("dsr - Got bad masternode address signature\n");
             Misbehaving(pfrom->GetId(), 100);
             return;
@@ -218,7 +211,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             CNode* pNode = FindNode(pmn->addr);
             if(pNode)
             {
-                pNode->PushMessage("dsai", vinMasternode, vchSig, nBlockHeight, nRelayType, in, out);
+                pNode->PushMessage("dsai", dsr);
                 return;
             }
         }
@@ -236,35 +229,28 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
-        CTxIn vinMasternode;
-        vector<unsigned char> vchSig;
-        int nBlockHeight;
-        int nRelayType;
-        CTxIn in;
-        CTxOut out;
+        CDarkSendRelay dsr;
+        vRecv >> dsr;
 
-        vRecv >> vinMasternode >> vchSig >> nBlockHeight >> nRelayType >> in >> out;
+        if(chainActive.Tip()->nHeight - dsr.nBlockHeight > 10) return;
+        if(dsr.nRelayType != DARKSEND_RELAY_IN &&
+            dsr.nRelayType != DARKSEND_RELAY_OUT &&
+            dsr.nRelayType != DARKSEND_RELAY_SIG) return;
 
-        if(chainActive.Tip()->nHeight - nBlockHeight > 10) return;
-        if(nRelayType != DARKSEND_RELAY_IN &&
-            nRelayType != DARKSEND_RELAY_OUT &&
-            nRelayType != DARKSEND_RELAY_SIG) return;
+        if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_IN) return;
+        if(dsr.out == CTxOut() && dsr.nRelayType == DARKSEND_RELAY_OUT) return;
+        if(dsr.in == CTxIn() && dsr.nRelayType == DARKSEND_RELAY_SIG) return;
 
-        if(in == CTxIn() && nRelayType == DARKSEND_RELAY_IN) return;
-        if(out == CTxOut() && nRelayType == DARKSEND_RELAY_OUT) return;
-        if(in == CTxIn() && nRelayType == DARKSEND_RELAY_SIG) return;
-
-
-        CMasternode* pmn = mnodeman.Find(vinMasternode);
+        CMasternode* pmn = mnodeman.Find(dsr.vinMasternode);
         if(!pmn){
-            LogPrintf("dsr -- unknown masternode! %s \n", vinMasternode.ToString().c_str());
+            LogPrintf("dsr -- unknown masternode! %s \n", dsr.vinMasternode.ToString().c_str());
             return;
         }
 
         //check the signature from the target masternode
-        std::string strMessage = boost::lexical_cast<std::string>(nBlockHeight);
+        std::string strMessage = boost::lexical_cast<std::string>(dsr.nBlockHeight);
         std::string errorMessage = "";
-        if(!darkSendSigner.VerifyMessage(pmn->pubkey, vchSig, strMessage, errorMessage)){
+        if(!darkSendSigner.VerifyMessage(pmn->pubkey, dsr.vchSig, strMessage, errorMessage)){
             LogPrintf("dsr - Got bad masternode address signature\n");
             Misbehaving(pfrom->GetId(), 100);
             return;
@@ -276,15 +262,15 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             return;
         }
 
-        switch(nRelayType){
+        switch(dsr.nRelayType){
         case DARKSEND_RELAY_IN:
-            anonTx.AddInput(in);
+            anonTx.AddInput(dsr.in);
             break;
         case DARKSEND_RELAY_OUT:
-            anonTx.AddOutput(out);
+            anonTx.AddOutput(dsr.out);
             break;
         case DARKSEND_RELAY_SIG:
-            anonTx.AddSig(in);
+            anonTx.AddSig(dsr.in);
             break;
         }
 
@@ -2346,7 +2332,9 @@ void CDarksendPool::RelayFinalTransaction(const int sessionID, const CTransactio
 
 void CDarksendPool::RelaySignaturesAnon(std::vector<CTxIn>& vin)
 {
+    //empty
     CTxOut out;
+
     BOOST_FOREACH(CTxIn& in, vin){
         CDarkSendRelay dsr(pSubmittedToMasternode->vin, vchMasternodeRelaySig, nMasternodeBlockHeight, DARKSEND_RELAY_SIG, in, out);
         dsr.Relay();
@@ -2355,6 +2343,7 @@ void CDarksendPool::RelaySignaturesAnon(std::vector<CTxIn>& vin)
 
 void CDarksendPool::RelayInAnon(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout)
 {
+    //empty in/out
     CTxOut out;
     CTxIn in;
 

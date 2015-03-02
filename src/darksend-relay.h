@@ -22,7 +22,8 @@ public:
     CTxIn in;
     CTxOut out;
 
-	CDarkSendRelay(CTxIn& vinMasternodeIn, vector<unsigned char>& vchSigIn, int nBlockHeightIn, int nRelayTypeIn, CTxIn& in2, CTxOut& out2);
+    CDarkSendRelay();
+    CDarkSendRelay(CTxIn& vinMasternodeIn, vector<unsigned char>& vchSigIn, int nBlockHeightIn, int nRelayTypeIn, CTxIn& in2, CTxOut& out2);
     
     IMPLEMENT_SERIALIZE
     (
@@ -36,19 +37,28 @@ public:
 
     void Relay()
     {
-        for(int i = 0; i <= 1; i++) //relay through two peers
-        {
-            int nRank = rand() % 20; 
-            CMasternode* pmn = mnodeman.GetMasternodeByRank(nRank, nBlockHeight, MIN_POOL_PEER_PROTO_VERSION);
+        int nRank1 = rand() % 20; 
+        int nRank2 = rand() % 20; 
 
-            if(pmn){
-                if(ConnectNode((CAddress)pmn->addr, NULL, true)){
-                    CNode* pNode = FindNode(pmn->addr);
-                    if(pNode)
-                    {
-                        pNode->PushMessage("dsr", (*this));
-                        return;
-                    }
+        //keep picking another second number till we get one that doesn't match
+        while(nRank1 == nRank2) nRank2 = rand() % 20;
+
+        //relay this message through 2 separate nodes for redundancy
+        RelayThroughNode(nRank1);
+        RelayThroughNode(nRank2);
+    }
+
+    void RelayThroughNode(int nRank)
+    {
+        CMasternode* pmn = mnodeman.GetMasternodeByRank(nRank, nBlockHeight, MIN_POOL_PEER_PROTO_VERSION);
+
+        if(pmn){
+            if(ConnectNode((CAddress)pmn->addr, NULL, true)){
+                CNode* pNode = FindNode(pmn->addr);
+                if(pNode)
+                {
+                    pNode->PushMessage("dsr", (*this));
+                    return;
                 }
             }
         }
