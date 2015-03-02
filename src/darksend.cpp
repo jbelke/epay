@@ -409,7 +409,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
             pfrom->PushMessage("dssu", sessionID, GetState(), GetEntriesCount(), MASTERNODE_ACCEPTED, error);
             Check();
 
-            RelayDarkSendStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
+            RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
         } else {
             pfrom->PushMessage("dssu", sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, error);
         }
@@ -464,7 +464,7 @@ void CDarksendPool::ProcessMessageDarksend(CNode* pfrom, std::string& strCommand
 
         if(success){
             Check();
-            RelayDarkSendStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
+            RelayStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
         }
     } else if (strCommand == "dsf") { //DarkSend Final tx
         if (pfrom->nVersion < MIN_POOL_PEER_PROTO_VERSION) {
@@ -727,7 +727,7 @@ void CDarksendPool::Check()
             SignFinalTransaction(txNew, NULL);
 
             // request signatures from clients
-            RelayDarkSendFinalTransaction(sessionID, txNew);
+            RelayFinalTransaction(sessionID, txNew);
         }
     }
 
@@ -752,7 +752,7 @@ void CDarksendPool::Check()
 
                     // not much we can do in this case
                     UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
-                    RelayDarkSendCompletedTransaction(sessionID, true, "Transaction not valid, please try again");
+                    RelayCompletedTransaction(sessionID, true, "Transaction not valid, please try again");
 
                     if(!fSubmitAnonymousFailed) 
                         fSubmitAnonymousFailed = true;
@@ -801,7 +801,7 @@ void CDarksendPool::Check()
                 txNew.RelayWalletTransaction();
 
                 // Tell the clients it was successful
-                RelayDarkSendCompletedTransaction(sessionID, false, _("Transaction created successfully."));
+                RelayCompletedTransaction(sessionID, false, _("Transaction created successfully."));
 
                 // Randomly charge clients
                 ChargeRandomFees();
@@ -814,7 +814,7 @@ void CDarksendPool::Check()
         if(fDebug) LogPrintf("CDarksendPool::Check() -- COMPLETED -- RESETTING \n");
         SetNull(true);
         UnlockCoins();
-        if(fMasterNode) RelayDarkSendStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
+        if(fMasterNode) RelayStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
         pwalletMain->Lock();
     }
 
@@ -822,7 +822,7 @@ void CDarksendPool::Check()
     if((state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) && GetTimeMillis()-lastTimeChanged >= 10000) {
         if(fDebug) LogPrintf("CDarksendPool::Check() -- RESETTING MESSAGE \n");
         SetNull(true);
-        if(fMasterNode) RelayDarkSendStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
+        if(fMasterNode) RelayStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
         UnlockCoins();
     }
 }
@@ -1024,7 +1024,7 @@ void CDarksendPool::CheckTimeout(){
                     UnlockCoins();
                 }
                 if(fMasterNode){
-                    RelayDarkSendStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
+                    RelayStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
                 }
                 break;
             }
@@ -1387,11 +1387,11 @@ void CDarksendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
 
     if(fSubmitAnonymous) {
         // submit inputs/outputs through relays
-        RelayDarkSendInAnon(vin, vout);
+        RelayInAnon(vin, vout);
 
     } else {
         // relay our entry to the master node
-        RelayDarkSendIn(vin, amount, txCollateral, vout);
+        RelayIn(vin, amount, txCollateral, vout);
     }
     Check();
 }
@@ -1513,7 +1513,7 @@ bool CDarksendPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNod
     }
 
     if(!fSubmitAnonymousFailed){
-        RelayDarkSendSignaturesAnon(sigs);
+        RelaySignaturesAnon(sigs);
     } else {
         // push all of our signatures to the masternode
         if(sigs.size() > 0 && node != NULL)

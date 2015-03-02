@@ -277,7 +277,7 @@ bool CActiveMasternode::Register(CTxIn vin, CService service, CKey keyCollateral
     }
 
     //send to all peers
-    LogPrintf("CActiveMasternode::Register() - RelayDarkSendElectionEntry vin = %s\n", vin.ToString().c_str());
+    LogPrintf("CActiveMasternode::Register() - RelayElectionEntry vin = %s\n", vin.ToString().c_str());
     mnodeman.RelayMasternodeEntry(vin, service, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyCollateralAddress, pubKeyMasternode, -1, -1, masterNodeSignatureTime, PROTOCOL_VERSION);
 
     return true;
