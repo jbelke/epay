@@ -48,11 +48,6 @@ void CDarkSendRelay::Relay()
     //relay this message through 2 separate nodes for redundancy
     RelayThroughNode(nRank1);
     RelayThroughNode(nRank2);
-    RelayThroughNode((rand() % nCount)+1);
-    RelayThroughNode((rand() % nCount)+1);
-    RelayThroughNode((rand() % nCount)+1);
-    RelayThroughNode((rand() % nCount)+1);
-    RelayThroughNode((rand() % nCount)+1);
 }
 
 void CDarkSendRelay::RelayThroughNode(int nRank)

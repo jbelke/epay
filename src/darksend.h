@@ -57,19 +57,24 @@ extern CActiveMasternode activeMasternode;
 // get the darksend chain depth for a given input
 int GetInputDarksendRounds(CTxIn in, int rounds=0);
 
-// An input in the darksend pool
-class CDarkSendEntryVin
+//
+// Holds an Darksend input
+//
+
+class CTxDSIn : public CTxIn
 {
 public:
-    bool isSigSet;
-    CTxIn vin;
+    bool fHasSig;
 
-    CDarkSendEntryVin()
+    CTxDSIn(const CTxIn& in)
     {
-        isSigSet = false;
-        vin = CTxIn();
+        prevout = in.prevout;
+        scriptSig = in.scriptSig;
+        prevPubKey = in.prevPubKey;
+        nSequence = in.nSequence;
     }
 };
+
 
 // A clients transaction in the darksend pool
 // -- holds the input/output mapping for each user in the pool
@@ -77,7 +82,7 @@ class CDarkSendEntry
 {
 public:
     bool isSet;
-    std::vector<CDarkSendEntryVin> sev;
+    std::vector<CTxIn> sev;
     int64_t amount;
     CTransaction collateral;
     std::vector<CTxOut> vout;
@@ -95,11 +100,7 @@ public:
     {
         if(isSet){return false;}
 
-        BOOST_FOREACH(const CTxIn v, vinIn) {
-            CDarkSendEntryVin s = CDarkSendEntryVin();
-            s.vin = v;
-            sev.push_back(s);
-        }
+        sev = vinIn;
         vout = voutIn;
         amount = amountIn;
         collateral = collateralIn;
@@ -107,22 +108,6 @@ public:
         addedTime = GetTime();
 
         return true;
-    }
-
-    bool AddSig(const CTxIn& vin)
-    {
-        BOOST_FOREACH(CDarkSendEntryVin& s, sev) {
-            if(s.vin.prevout == vin.prevout && s.vin.nSequence == vin.nSequence){
-                if(s.isSigSet){return false;}
-                s.vin.scriptSig = vin.scriptSig;
-                s.vin.prevPubKey = vin.prevPubKey;
-                s.isSigSet = true;
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     bool IsExpired()
@@ -230,30 +215,12 @@ public:
 };
 
 //
-// Holds an anonymous input
-//
-
-class CTxAnonIn : public CTxIn
-{
-public:
-    bool fHasSig;
-
-    CTxAnonIn(const CTxIn& in)
-    {
-        prevout = in.prevout;
-        scriptSig = in.scriptSig;
-        prevPubKey = in.prevPubKey;
-        nSequence = in.nSequence;
-    }
-};
-
-//
 // Build a transaction anonymously
 //
 class CDSAnonTx
 {
 public:
-    std::vector<CTxAnonIn> vin;
+    std::vector<CTxDSIn> vin;
     std::vector<CTxOut> vout;
 
     bool IsTransactionValid();
@@ -363,6 +330,7 @@ public:
 
     bool SetCollateralAddress(std::string strAddress);
     void Reset();
+    bool Downgrade();
     void SetNull(bool clearEverything=false);
 
     void UnlockCoins();
@@ -444,6 +412,7 @@ public:
 
     // check for process in Darksend
     void Check();
+    void CheckFinalTransaction();
     // charge fees to bad actors
     void ChargeFees();
     // rarely charge fees to pay miners
