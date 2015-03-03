@@ -291,6 +291,7 @@ public:
     // used for securing the anonymous relay system
     vector<unsigned char> vchMasternodeRelaySig;
     int nMasternodeBlockHeight;
+    bool fResentInputsOutputs;
 
     //incremented whenever a DSQ comes through
     int64_t nDsqCount;
@@ -307,6 +308,7 @@ public:
         minBlockSpacing = 1;
         nDsqCount = 0;
         lastNewBlock = 0;
+        fResentInputsOutputs = false;
 
         SetNull();
     }
@@ -331,6 +333,8 @@ public:
     bool SetCollateralAddress(std::string strAddress);
     void Reset();
     bool Downgrade();
+    bool ResendMissingInputsOutputs();
+
     void SetNull(bool clearEverything=false);
 
     void UnlockCoins();
@@ -432,9 +436,7 @@ public:
     bool AddAnonymousSig(const CTxIn& in) {return anonTx.AddSig(in);}
     bool AddRelaySignature(vector<unsigned char> vchMasternodeRelaySigIn, int nMasternodeBlockHeightIn) {
         vchMasternodeRelaySig = vchMasternodeRelaySigIn;
-        nMasternodeBlockHeight = nMasternodeBlockHeightIn;
-        
-        printf("AddRelaySignature %d %d \n", (int)vchMasternodeRelaySig.size(), nMasternodeBlockHeight);
+        nMasternodeBlockHeight = nMasternodeBlockHeightIn;        
         return true;
     }
 

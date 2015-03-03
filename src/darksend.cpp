@@ -610,6 +610,7 @@ void CDarksendPool::SetNull(bool clearEverything){
     entries.clear();
     anonTx.vin.clear();
     anonTx.vout.clear();
+    fResentInputsOutputs = false;
 
     state = POOL_STATUS_ACCEPTING_ENTRIES;
 
@@ -716,15 +717,11 @@ void CDarksendPool::Check()
                     txNew.vout.push_back(v);
             }
 
-            bool fIsNew = ((int)txNew.vin.size()+(int)txNew.vout.size() > (int)finalTransaction.vin.size()+(int)finalTransaction.vout.size());
-
             if(fDebug) LogPrintf("Transaction 1: %s\n", txNew.ToString().c_str());
             SignFinalTransaction(txNew, NULL);
             
-            if(fIsNew){
-                // request signatures from clients
-                RelayFinalTransaction(sessionID, finalTransaction);
-            }
+            // request signatures from clients
+            RelayFinalTransaction(sessionID, finalTransaction);
         }
     }
 
@@ -1052,7 +1049,6 @@ void CDarksendPool::CheckTimeout(){
             sessionFoundMasternode = false;
             vecSessionCollateral.clear();
 
-            printf("POOL_STATUS_ACCEPTING_ENTRIES 2\n");
             UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
         }
     } else if(GetTimeMillis()-lastTimeChanged >= (DARKSEND_QUEUE_TIMEOUT*1000)+addLagTime){
@@ -1096,7 +1092,6 @@ void CDarksendPool::CheckForCompleteQueue(){
     // which is the active state right before merging the transaction
     //
     if(state == POOL_STATUS_QUEUE && sessionUsers == GetMaxPoolTransactions()) {
-        printf("POOL_STATUS_ACCEPTING_ENTRIES 3\n");
         UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
 
         CDarksendQueue dsq;
@@ -1341,7 +1336,6 @@ void CDarksendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
         return;
     }
 
-    printf("POOL_STATUS_ACCEPTING_ENTRIES 4\n");
     UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
 
     LogPrintf("CDarksendPool::SendDarksendDenominate() - Added transaction to pool.\n");
@@ -1423,7 +1417,6 @@ bool CDarksendPool::StatusUpdate(int newState, int newEntriesCount, int newAccep
         } else if (newAccepted == 0 && sessionID == 0 && !sessionFoundMasternode) {
             LogPrintf("CDarksendPool::StatusUpdate - entry not accepted by masternode \n");
             UnlockCoins();
-            printf("POOL_STATUS_ACCEPTING_ENTRIES 5\n");
             UpdateState(POOL_STATUS_ACCEPTING_ENTRIES);
             DoAutomaticDenominating(); //try another masternode
         }
@@ -1484,6 +1477,7 @@ bool CDarksendPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNod
                     // in this case, something went wrong and we'll refuse to sign. It's possible we'll be charged collateral. But that's
                     // better then signing if the transaction doesn't look like what we wanted.
                     LogPrintf("CDarksendPool::Sign - My entries are not correct! Refusing to sign. %d entries %d target. \n", foundOutputs, targetOuputs);
+                    ResendMissingInputsOutputs();
                     return false;
                 }
 
@@ -1846,6 +1840,20 @@ bool CDarksendPool::Downgrade()
     // relay our entry to the master node
     RelayIn(myEntries[0].sev, myEntries[0].amount, txCollateral, myEntries[0].vout);
 
+    return true;
+}
+
+bool CDarksendPool::ResendMissingInputsOutputs()
+{
+    if(fResentInputsOutputs) {
+        Downgrade();
+        return true;
+    }
+    if(myEntries.size() == 0) return false;
+
+    LogPrintf("CDarksendPool::Downgrade() : Downgrading and submitting directly\n");
+    RelayInAnon(myEntries[0].sev, myEntries[0].vout);
+    fResentInputsOutputs = true;
     return true;
 }
 
