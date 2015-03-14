@@ -1,4 +1,4 @@
-Building ePay
+Building Ecash
 
 Use the autogen script to prepare the build environment.
 
@@ -7,10 +7,10 @@ Use the autogen script to prepare the build environment.
     make
 
 Precompiled binaries are available at github, see
-https://github.com/epayproject/epay-binaries
+https://github.com/ecashproject/ecash-binaries
 
 Always verify the signatures and checksums.
 
-See doc/build-*.md for instructions on building epayd,
+See doc/build-*.md for instructions on building ecashd,
 the intended-for-services, no-graphical-interface, reference
-implementation of ePay.
+implementation of Ecash.

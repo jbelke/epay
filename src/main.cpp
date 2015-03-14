@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Darkcoin developers
-// Copyright (c) 2015- The ePay developers
+// Copyright (c) 2015- The Ecash developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -34,7 +34,7 @@ using namespace std;
 using namespace boost;
 
 #if defined(NDEBUG)
-# error "ePay cannot be compiled without assertions."
+# error "Ecash cannot be compiled without assertions."
 #endif
 
 //
@@ -83,7 +83,7 @@ void EraseOrphansFor(NodeId peer);
 // Constant stuff for coinbase transactions we create:
 CScript COINBASE_FLAGS;
 
-const string strMessageMagic = "ePay Signed Message:\n";
+const string strMessageMagic = "Ecash Signed Message:\n";
 
 // Internal stuff
 namespace {
@@ -1498,8 +1498,8 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue)
     return ret;
 }
 
-static const int64_t nTargetTimespan = 24 * 60 * 60; // ePay: 1 day
-static const int64_t nTargetSpacing = 2.5 * 60; // ePay: 2.5 minutes
+static const int64_t nTargetTimespan = 24 * 60 * 60; // Ecash: 1 day
+static const int64_t nTargetSpacing = 2.5 * 60; // Ecash: 2.5 minutes
 static const int64_t nInterval = nTargetTimespan / nTargetSpacing; // 576 blocks
 
 //
@@ -1585,7 +1585,7 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const CBloc
 }
 
 unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const CBlockHeader *pblock) {
-    /* current difficulty formula, epay - DarkGravity v3, written by Evan Duffield - evan@epay.io */
+    /* current difficulty formula, ecash - DarkGravity v3, written by Evan Duffield - evan@ecash.io */
     const CBlockIndex *BlockLastSolved = pindexLast;
     const CBlockIndex *BlockReading = pindexLast;
     const CBlockHeader *BlockCreating = pblock;
@@ -1686,7 +1686,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
                 return pindexLast->nBits;
             }
 
-            // ePay: This fixes an issue where a 51% attack can change difficulty at will.
+            // Ecash: This fixes an issue where a 51% attack can change difficulty at will.
             // Go back the full period unless it's the first retarget after genesis.
             // Code courtesy of Art Forz.
             int blockstogoback = nInterval-1;
@@ -2163,7 +2163,7 @@ bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, unsigne
 static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck() {
-    RenameThread("epay-scriptch");
+    RenameThread("ecash-scriptch");
     scriptcheckqueue.Thread();
 }
 

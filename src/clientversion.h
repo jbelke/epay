@@ -8,11 +8,11 @@
 // client versioning and copyright year
 //
 
-// These need to be macros, as version.cpp's and epay-qt.rc's voodoo requires it
+// These need to be macros, as version.cpp's and ecash-qt.rc's voodoo requires it
 #define CLIENT_VERSION_MAJOR       0
 #define CLIENT_VERSION_MINOR       11
 #define CLIENT_VERSION_REVISION    1
-#define CLIENT_VERSION_BUILD       254
+#define CLIENT_VERSION_BUILD       253
 
 
 

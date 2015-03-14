@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Darkcoin developers
-// Copyright (c) 2015- The ePay developers
+// Copyright (c) 2015- The Ecash developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -70,10 +70,10 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case CASH: return QString("ePays");
-            case mCASH: return QString("Milli-ePays (1 / 1,000)");
-            case uCASH: return QString("Micro-ePays (1 / 1,000,000)");
-            case duffs: return QString("Ten Nano-ePays (1 / 100,000,000)");
+            case CASH: return QString("Ecashs");
+            case mCASH: return QString("Milli-Ecashs (1 / 1,000)");
+            case uCASH: return QString("Micro-Ecashs (1 / 1,000,000)");
+            case duffs: return QString("Ten Nano-Ecashs (1 / 100,000,000)");
             default: return QString("???");
         }
     }
@@ -81,10 +81,10 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case CASH: return QString("Testepays");
-            case mCASH: return QString("Milli-Testepays (1 / 1,000)");
-            case uCASH: return QString("Micro-Testepays (1 / 1,000,000)");
-            case duffs: return QString("Ten Nano-Testepays (1 / 100,000,000)");
+            case CASH: return QString("Testecashs");
+            case mCASH: return QString("Milli-Testecashs (1 / 1,000)");
+            case uCASH: return QString("Micro-Testecashs (1 / 1,000,000)");
+            case duffs: return QString("Ten Nano-Testecashs (1 / 100,000,000)");
             default: return QString("???");
         }
     }
