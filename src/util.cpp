@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Darkcoin developers
-// Copyright (c) 2015- The Ecash developers
+// Copyright (c) 2015- The ePay developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -94,14 +94,14 @@ namespace boost {
 
 using namespace std;
 
-//Ecash only features
+//ePay only features
 bool fMasterNode = false;
 string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
 bool fLiteMode = false;
 int nInstantXDepth = 1;
 int nDarksendRounds = 2;
-int nAnonymizeEcashAmount = 1000;
+int nAnonymizeePayAmount = 1000;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */
 int64_t enforceMasternodePaymentsTime = 4085657524;
@@ -994,7 +994,7 @@ static std::string FormatException(std::exception* pex, const char* pszThread)
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(NULL, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "ecash";
+    const char* pszModule = "epay";
 #endif
     if (pex)
         return strprintf(
@@ -1021,13 +1021,13 @@ void PrintExceptionContinue(std::exception* pex, const char* pszThread)
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Ecash
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Ecash
-    // Mac: ~/Library/Application Support/Ecash
-    // Unix: ~/.ecash
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\ePay
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\ePay
+    // Mac: ~/Library/Application Support/ePay
+    // Unix: ~/.epay
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Ecash";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "ePay";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -1039,10 +1039,10 @@ boost::filesystem::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    return pathRet / "Ecash";
+    return pathRet / "ePay";
 #else
     // Unix
-    return pathRet / ".ecash";
+    return pathRet / ".epay";
 #endif
 #endif
 }
@@ -1091,7 +1091,7 @@ void ClearDatadirCache()
 
 boost::filesystem::path GetConfigFile()
 {
-    boost::filesystem::path pathConfigFile(GetArg("-conf", "ecash.conf"));
+    boost::filesystem::path pathConfigFile(GetArg("-conf", "epay.conf"));
     if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir(false) / pathConfigFile;
     return pathConfigFile;
 }
@@ -1108,14 +1108,14 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 {
     boost::filesystem::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good())
-        return; // No ecash.conf file is OK
+        return; // No epay.conf file is OK
 
     set<string> setOptions;
     setOptions.insert("*");
 
     for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it)
     {
-        // Don't overwrite existing settings so command line settings override ecash.conf
+        // Don't overwrite existing settings so command line settings override epay.conf
         string strKey = string("-") + it->string_key;
         if (mapSettingsRet.count(strKey) == 0)
         {
@@ -1131,7 +1131,7 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 
 boost::filesystem::path GetPidFile()
 {
-    boost::filesystem::path pathPidFile(GetArg("-pid", "ecashd.pid"));
+    boost::filesystem::path pathPidFile(GetArg("-pid", "epayd.pid"));
     if (!pathPidFile.is_complete()) pathPidFile = GetDataDir() / pathPidFile;
     return pathPidFile;
 }
@@ -1364,7 +1364,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nTime)
                 if (!fMatch)
                 {
                     fDone = true;
-                    string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong Ecash will not work properly.");
+                    string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong ePay will not work properly.");
                     strMiscWarning = strMessage;
                     LogPrintf("*** %s\n", strMessage);
                     uiInterface.ThreadSafeMessageBox(strMessage, "", CClientUIInterface::MSG_WARNING);

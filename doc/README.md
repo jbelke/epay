@@ -1,9 +1,9 @@
-Ecash 0.11.x BETA
+ePay 0.11.x BETA
 ====================
 
 Copyright (c) 2009-2015 Bitcoin Developers
 
-Copyright (c) 2014-2015 Ecash Developers
+Copyright (c) 2014-2015 ePay Developers
 
 
 Setup

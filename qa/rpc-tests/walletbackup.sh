@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Copyright (c) 2014 The Bitcoin Core developers
 # Copyright (c) 2014-2015 The Darkcoin developers
-# Copyright (c) 2015- The Ecash developers
+# Copyright (c) 2015- The ePay developers
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -41,8 +41,8 @@ if [ $# -lt 1 ]; then
         exit 1
 fi
 
-BITCOIND=${1}/ecashd
-CLI=${1}/ecash-cli
+BITCOIND=${1}/epayd
+CLI=${1}/epay-cli
 
 DIR="${BASH_SOURCE%/*}"
 SENDANDWAIT="${DIR}/send.sh"
@@ -66,7 +66,7 @@ B4PID=$!
 function CreateConfDir {
   DIR=$1
   mkdir -p $DIR
-  CONF=$DIR/ecash.conf
+  CONF=$DIR/epay.conf
   echo "regtest=1" >> $CONF
   echo "rpcuser=rt" >> $CONF
   echo "rpcpassword=rt" >> $CONF

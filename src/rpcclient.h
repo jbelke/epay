@@ -14,11 +14,11 @@ int CommandLineRPC(int argc, char *argv[]);
 
 json_spirit::Array RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams);
 
-/** Show help message for ecash-cli.
+/** Show help message for epay-cli.
  * The mainProgram argument is used to determine whether to show this message as main program
  * (and include some common options) or as sub-header of another help message.
  *
- * @note the argument can be removed once ecash-cli functionality is removed from ecashd
+ * @note the argument can be removed once epay-cli functionality is removed from epayd
  */
 std::string HelpMessageCli(bool mainProgram);
 

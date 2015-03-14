@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2015 The Darkcoin developers
-// Copyright (c) 2015- The Ecash developers
+// Copyright (c) 2015- The ePay developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -422,7 +422,7 @@ public:
     // get the denominations for a list of outputs (returns a bitshifted integer)
     int GetDenominations(const std::vector<CTxOut>& vout);
     void GetDenominationsToString(int nDenom, std::string& strDenom);
-    // get the denominations for a specific amount of ecash.
+    // get the denominations for a specific amount of epay.
     int GetDenominationsByAmount(int64_t nAmount, int nDenomTarget=0);
 
     int GetDenominationsByAmounts(std::vector<int64_t>& vecAmount);

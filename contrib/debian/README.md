@@ -1,21 +1,21 @@
 
 Debian
 ====================
-This directory contains files used to package ecashd/ecash-qt
-for Debian-based Linux systems. If you compile ecashd/ecash-qt yourself, there are some useful files here.
+This directory contains files used to package epayd/epay-qt
+for Debian-based Linux systems. If you compile epayd/epay-qt yourself, there are some useful files here.
 
-## ecash: URI support ##
+## epay: URI support ##
 
 
-ecash-qt.desktop  (Gnome / Open Desktop)
+epay-qt.desktop  (Gnome / Open Desktop)
 To install:
 
-	sudo desktop-file-install ecash-qt.desktop
+	sudo desktop-file-install epay-qt.desktop
 	sudo update-desktop-database
 
 If you build yourself, you will either need to modify the paths in
-the .desktop file or copy or symlink your ecash-qt binary to `/usr/bin`
-and the `../../share/pixmaps/ecash128.png` to `/usr/share/pixmaps`
+the .desktop file or copy or symlink your epay-qt binary to `/usr/bin`
+and the `../../share/pixmaps/epay128.png` to `/usr/share/pixmaps`
 
-ecash-qt.protocol (KDE)
+epay-qt.protocol (KDE)
 
