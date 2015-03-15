@@ -137,7 +137,7 @@ QT_TRANSLATE_NOOP("epay-core", ""
 "Unable to locate enough Darksend denominated funds for this transaction."),
 QT_TRANSLATE_NOOP("epay-core", ""
 "Unable to locate enough Darksend non-denominated funds for this transaction "
-"that are not equal 1000 CASH."),
+"that are not equal 1000 PAY."),
 QT_TRANSLATE_NOOP("epay-core", ""
 "Unable to locate enough Darksend non-denominated funds for this transaction."),
 QT_TRANSLATE_NOOP("epay-core", ""

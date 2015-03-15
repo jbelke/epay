@@ -1102,12 +1102,12 @@ Cím: %4
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="78"/>
-        <source>Use 2 separate masternodes to mix funds up to 1000 CASH</source>
+        <source>Use 2 separate masternodes to mix funds up to 1000 PAY</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="91"/>
-        <source>Use 8 separate masternodes to mix funds up to 1000 CASH</source>
+        <source>Use 8 separate masternodes to mix funds up to 1000 PAY</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1117,17 +1117,17 @@ Cím: %4
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="117"/>
-        <source>This option is the quickest and will cost about ~0.025 CASH to anonymize 1000 CASH</source>
+        <source>This option is the quickest and will cost about ~0.025 PAY to anonymize 1000 PAY</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="130"/>
-        <source>This option is moderately fast and will cost about 0.05 CASH to anonymize 1000 CASH</source>
+        <source>This option is moderately fast and will cost about 0.05 PAY to anonymize 1000 PAY</source>
         <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="156"/>
-        <source>0.1 CASH per 1000 CASH you anonymize.</source>
+        <source>0.1 PAY per 1000 PAY you anonymize.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1765,8 +1765,8 @@ A pénztárca fájl is ebben a könyvtárban kerül letárolásra.</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="349"/>
-        <source>0 CASH</source>
-        <translation>0 CASH</translation>
+        <source>0 PAY</source>
+        <translation>0 PAY</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="356"/>
@@ -1775,8 +1775,8 @@ A pénztárca fájl is ebben a könyvtárban kerül letárolásra.</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="363"/>
-        <source>0 CASH / 0 Rounds</source>
-        <translation>0 CASH / 0 kör</translation>
+        <source>0 PAY / 0 Rounds</source>
+        <translation>0 PAY / 0 kör</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="370"/>
@@ -1786,7 +1786,7 @@ A pénztárca fájl is ebben a könyvtárban kerül letárolásra.</translation>
     <message>
         <location filename="../forms/overviewpage.ui" line="377"/>
         <source>The denominations you submitted to the Masternode. To mix, other users must submit the exact same denominations.</source>
-        <translation>A masternode felé feladott bontás - 10CASH, 1CASH, stb. Az anonimizáláshoz szükséges, hogy más felhasználók is adjanak fel azonos bontásokat.</translation>
+        <translation>A masternode felé feladott bontás - 10PAY, 1PAY, stb. Az anonimizáláshoz szükséges, hogy más felhasználók is adjanak fel azonos bontásokat.</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="380"/>
@@ -4042,7 +4042,7 @@ for example: alertnotify=echo %%s | mail -s &quot;ePay Alert&quot; admin@foo.com
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="138"/>
-        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 CASH.</source>
+        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 PAY.</source>
         <translation type="unfinished"/>
     </message>
     <message>

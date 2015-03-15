@@ -1102,13 +1102,13 @@ Address: %4
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="78"/>
-        <source>Use 2 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>使用2个独立主节点进行混合至多1000个CASH</translation>
+        <source>Use 2 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>使用2个独立主节点进行混合至多1000个PAY</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="91"/>
-        <source>Use 8 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>使用8个独立主节点进行混合至多1000个CASH</translation>
+        <source>Use 8 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>使用8个独立主节点进行混合至多1000个PAY</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="104"/>
@@ -1117,18 +1117,18 @@ Address: %4
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="117"/>
-        <source>This option is the quickest and will cost about ~0.025 CASH to anonymize 1000 CASH</source>
-        <translation>此选项提供最快速度并且将花费大概0.025CASH的费用以匿名化1000CASH</translation>
+        <source>This option is the quickest and will cost about ~0.025 PAY to anonymize 1000 PAY</source>
+        <translation>此选项提供最快速度并且将花费大概0.025PAY的费用以匿名化1000PAY</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="130"/>
-        <source>This option is moderately fast and will cost about 0.05 CASH to anonymize 1000 CASH</source>
-        <translation>此选项提供中等速度并且将花费大概0.05CASH的费用以匿名化1000CASH</translation>
+        <source>This option is moderately fast and will cost about 0.05 PAY to anonymize 1000 PAY</source>
+        <translation>此选项提供中等速度并且将花费大概0.05PAY的费用以匿名化1000PAY</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="156"/>
-        <source>0.1 CASH per 1000 CASH you anonymize.</source>
-        <translation>0.1CASH每匿名化1000CASH</translation>
+        <source>0.1 PAY per 1000 PAY you anonymize.</source>
+        <translation>0.1PAY每匿名化1000PAY</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="143"/>
@@ -1764,8 +1764,8 @@ Address: %4
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="349"/>
-        <source>0 CASH</source>
-        <translation>0 CASH</translation>
+        <source>0 PAY</source>
+        <translation>0 PAY</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="356"/>
@@ -1774,8 +1774,8 @@ Address: %4
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="363"/>
-        <source>0 CASH / 0 Rounds</source>
-        <translation>0 CASH/ 0 轮循环</translation>
+        <source>0 PAY / 0 Rounds</source>
+        <translation>0 PAY/ 0 轮循环</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="370"/>
@@ -1785,7 +1785,7 @@ Address: %4
     <message>
         <location filename="../forms/overviewpage.ui" line="377"/>
         <source>The denominations you submitted to the Masternode. To mix, other users must submit the exact same denominations.</source>
-        <translation>您向主节点所提交的用以面额化混合的CASH，当其他用户提交相同的面额化CASH数量时，将开始混合。</translation>
+        <translation>您向主节点所提交的用以面额化混合的PAY，当其他用户提交相同的面额化PAY数量时，将开始混合。</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="380"/>
@@ -4041,7 +4041,7 @@ for example: alertnotify=echo %%s | mail -s &quot;ePay Alert&quot; admin@foo.com
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="138"/>
-        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 CASH.</source>
+        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 PAY.</source>
         <translation type="unfinished"/>
     </message>
     <message>

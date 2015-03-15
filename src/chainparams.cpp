@@ -136,8 +136,8 @@ public:
         base58Prefixes[PUBKEY_ADDRESS] = list_of(139);                    // Testnet epay addresses start with 'x' or 'y'
         base58Prefixes[SCRIPT_ADDRESS] = list_of( 19);                    // Testnet epay script addresses start with '8' or '9'
         base58Prefixes[SECRET_KEY]     = list_of(239);                    // Testnet private keys start with '9' or 'c' (Bitcoin defaults)
-        base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x3a)(0x80)(0x61)(0xa0); // Testnet epay BIP32 pubkeys start with 'CASHV'
-        base58Prefixes[EXT_SECRET_KEY] = list_of(0x3a)(0x80)(0x58)(0x37); // Testnet epay BIP32 prvkeys start with 'CASHP'
+        base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x3a)(0x80)(0x61)(0xa0); // Testnet epay BIP32 pubkeys start with 'PAYV'
+        base58Prefixes[EXT_SECRET_KEY] = list_of(0x3a)(0x80)(0x58)(0x37); // Testnet epay BIP32 prvkeys start with 'PAYP'
         base58Prefixes[EXT_COIN_TYPE]  = list_of(0x80000001);             // Testnet epay BIP44 coin type is '5' (All coin's testnet default)
     }
     virtual Network NetworkID() const { return CChainParams::TESTNET; }

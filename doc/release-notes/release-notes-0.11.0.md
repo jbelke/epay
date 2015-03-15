@@ -21,8 +21,8 @@ Darkcoin Core:
 - Defined BIP32 (HD) address versions to start with `drkp`/`drkv` (`DRKP`/`DRKV`
   for testnet)
 - Adapted BIP44 coin type `5` for Darkcoin (0x80000005) as defined in SLIP-0044
-- Added new units: `duffs` (1 / 100.000.000 CASH)
-- Added units for testnet: tCASH, mtCASH, utCASH, tduffs
+- Added new units: `duffs` (1 / 100.000.000 PAY)
+- Added units for testnet: tPAY, mtPAY, utPAY, tduffs
 - Added new DNS seed from masternode.io
 - Fixed wallet locking after sending coins
 - Add `-regtest` mode, similar to testnet but private with instant block
@@ -45,9 +45,9 @@ Masternodes:
 
 Darksend:
 
-- Reduced lower darksend limit to 1.5 CASH
+- Reduced lower darksend limit to 1.5 PAY
 - Fixed progress bar calculation for low amounts
-- Improved support for adding CASH after anon has completed
+- Improved support for adding PAY after anon has completed
 - Added denomination information to Overview tab
 - Added more detailed Darksend status information to Overview tab
 - Added Darksend high precision matching engine
@@ -137,7 +137,7 @@ Protocol and network code:
 - Prevent socket leak in ThreadSocketHandler and correct some proxy related
   socket leaks
 - Use pnode->nLastRecv as sync score (was the wrong way around)
-- Drop the fee required to relay a transaction to 0.01mCASH per kilobyte
+- Drop the fee required to relay a transaction to 0.01mPAY per kilobyte
 - Send tx relay flag with version
 - New 'reject' P2P message (BIP 0061, see
   https://gist.github.com/gavinandresen/7079034 for draft)

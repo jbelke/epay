@@ -27,9 +27,9 @@ public:
      */
     enum Unit
     {
-        CASH,
-        mCASH,
-        uCASH,
+        PAY,
+        mPAY,
+        uPAY,
         duffs
     };
 

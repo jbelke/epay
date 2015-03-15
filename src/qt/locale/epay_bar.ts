@@ -1116,13 +1116,13 @@ Wird zugmachd, wails bessa is.</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="78"/>
-        <source>Use 2 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>Zwo faschihdene Mastanoods füa Beträge bis 1000CASH</translation>
+        <source>Use 2 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>Zwo faschihdene Mastanoods füa Beträge bis 1000PAY</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="91"/>
-        <source>Use 8 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>Achd faschihdene Mastanoods füa Beträge bis 1000CASH</translation>
+        <source>Use 8 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>Achd faschihdene Mastanoods füa Beträge bis 1000PAY</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="104"/>
@@ -1131,18 +1131,18 @@ Wird zugmachd, wails bessa is.</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="117"/>
-        <source>This option is the quickest and will cost about ~0.025 CASH to anonymize 1000 CASH</source>
-        <translation>S´ god am schnellsdn und kosst so umgfahr 0.025 CASH um 1000 CASH dih Kapuzzn aufzumsäzzn.</translation>
+        <source>This option is the quickest and will cost about ~0.025 PAY to anonymize 1000 PAY</source>
+        <translation>S´ god am schnellsdn und kosst so umgfahr 0.025 PAY um 1000 PAY dih Kapuzzn aufzumsäzzn.</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="130"/>
-        <source>This option is moderately fast and will cost about 0.05 CASH to anonymize 1000 CASH</source>
-        <translation>S´ god so middl schnell und kosst so umgfahr 0.05 CASH dih Kapuzzn aufzumsäzzn.</translation>
+        <source>This option is moderately fast and will cost about 0.05 PAY to anonymize 1000 PAY</source>
+        <translation>S´ god so middl schnell und kosst so umgfahr 0.05 PAY dih Kapuzzn aufzumsäzzn.</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="156"/>
-        <source>0.1 CASH per 1000 CASH you anonymize.</source>
-        <translation>kost zirka 0.1 CASH per 1000 Kapuzzn-CASH </translation>
+        <source>0.1 PAY per 1000 PAY you anonymize.</source>
+        <translation>kost zirka 0.1 PAY per 1000 Kapuzzn-PAY </translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="143"/>
@@ -1785,8 +1785,8 @@ Aba, wards ab, des wird. Brauchd bloss a Minudn bis der Darkcon Koa mid di andan
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="349"/>
-        <source>0 CASH</source>
-        <translation>koi oanziga CASH</translation>
+        <source>0 PAY</source>
+        <translation>koi oanziga PAY</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="356"/>
@@ -1795,8 +1795,8 @@ Aba, wards ab, des wird. Brauchd bloss a Minudn bis der Darkcon Koa mid di andan
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="363"/>
-        <source>0 CASH / 0 Rounds</source>
-        <translation>koi CASH / koine Rundn</translation>
+        <source>0 PAY / 0 Rounds</source>
+        <translation>koi PAY / koine Rundn</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="370"/>
@@ -4063,7 +4063,7 @@ for example: alertnotify=echo %%s | mail -s &quot;ePay Alert&quot; admin@foo.com
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="138"/>
-        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 CASH.</source>
+        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 PAY.</source>
         <translation type="unfinished"/>
     </message>
     <message>

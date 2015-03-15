@@ -767,7 +767,7 @@ void CDarkSendPool::ChargeRandomFees(){
                 with using it to stop abuse. Otherwise it could serve as an attack vector and
                 allow endless transaction that would bloat ePay and make it unusable. To
                 stop these kinds of attacks 1 in 50 successful transactions are charged. This
-                adds up to a cost of 0.002CASH per transaction on average.
+                adds up to a cost of 0.002PAY per transaction on average.
             */
             if(r <= 20)
             {
@@ -1456,7 +1456,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
         if(sessionTotalValue > nBalanceNeedsAnonymized) sessionTotalValue = nBalanceNeedsAnonymized;
 
         double fePaySubmitted = (sessionTotalValue / CENT);
-        LogPrintf("Submitting Darksend for %f CASH CENT - sessionTotalValue %d\n", fePaySubmitted, sessionTotalValue);
+        LogPrintf("Submitting Darksend for %f PAY CENT - sessionTotalValue %d\n", fePaySubmitted, sessionTotalValue);
 
         if(pwalletMain->GetDenominatedBalance(true, true) > 0){ //get denominated unconfirmed inputs
             LogPrintf("DoAutomaticDenominating -- Found unconfirmed denominated outputs, will wait till they confirm to continue.\n");
@@ -1840,10 +1840,10 @@ bool CDarkSendPool::IsCompatibleWithSession(int64_t nDenom, CTransaction txColla
 void CDarkSendPool::GetDenominationsToString(int nDenom, std::string& strDenom){
     // Function returns as follows:
     //
-    // bit 0 - 100CASH+1 ( bit on if present )
-    // bit 1 - 10CASH+1
-    // bit 2 - 1CASH+1
-    // bit 3 - .1CASH+1
+    // bit 0 - 100PAY+1 ( bit on if present )
+    // bit 1 - 10PAY+1
+    // bit 2 - 1PAY+1
+    // bit 3 - .1PAY+1
     // bit 3 - non-denom
 
 
@@ -1899,10 +1899,10 @@ int CDarkSendPool::GetDenominations(const std::vector<CTxOut>& vout){
 
     // Function returns as follows:
     //
-    // bit 0 - 100CASH+1 ( bit on if present )
-    // bit 1 - 10CASH+1
-    // bit 2 - 1CASH+1
-    // bit 3 - .1CASH+1
+    // bit 0 - 100PAY+1 ( bit on if present )
+    // bit 1 - 10PAY+1
+    // bit 2 - 1PAY+1
+    // bit 3 - .1PAY+1
 
     return denom;
 }

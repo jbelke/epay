@@ -17,9 +17,9 @@ BitcoinUnits::BitcoinUnits(QObject *parent):
 QList<BitcoinUnits::Unit> BitcoinUnits::availableUnits()
 {
     QList<BitcoinUnits::Unit> unitlist;
-    unitlist.append(CASH);
-    unitlist.append(mCASH);
-    unitlist.append(uCASH);
+    unitlist.append(PAY);
+    unitlist.append(mPAY);
+    unitlist.append(uPAY);
     unitlist.append(duffs);
     return unitlist;
 }
@@ -28,9 +28,9 @@ bool BitcoinUnits::valid(int unit)
 {
     switch(unit)
     {
-    case CASH:
-    case mCASH:
-    case uCASH:
+    case PAY:
+    case mPAY:
+    case uPAY:
     case duffs:
         return true;
     default:
@@ -44,9 +44,9 @@ QString BitcoinUnits::name(int unit)
     {
         switch(unit)
         {
-            case CASH: return QString("CASH");
-            case mCASH: return QString("mCASH");
-            case uCASH: return QString::fromUtf8("μCASH");
+            case PAY: return QString("PAY");
+            case mPAY: return QString("mPAY");
+            case uPAY: return QString::fromUtf8("μPAY");
             case duffs: return QString::fromUtf8("duffs");
             default: return QString("???");
         }
@@ -55,9 +55,9 @@ QString BitcoinUnits::name(int unit)
     {
         switch(unit)
         {
-            case CASH: return QString("tCASH");
-            case mCASH: return QString("mtCASH");
-            case uCASH: return QString::fromUtf8("μtCASH");
+            case PAY: return QString("tPAY");
+            case mPAY: return QString("mtPAY");
+            case uPAY: return QString::fromUtf8("μtPAY");
             case duffs: return QString::fromUtf8("tduffs");
             default: return QString("???");
         }
@@ -70,9 +70,9 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case CASH: return QString("ePays");
-            case mCASH: return QString("Milli-ePays (1 / 1,000)");
-            case uCASH: return QString("Micro-ePays (1 / 1,000,000)");
+            case PAY: return QString("ePays");
+            case mPAY: return QString("Milli-ePays (1 / 1,000)");
+            case uPAY: return QString("Micro-ePays (1 / 1,000,000)");
             case duffs: return QString("Ten Nano-ePays (1 / 100,000,000)");
             default: return QString("???");
         }
@@ -81,9 +81,9 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case CASH: return QString("Testepays");
-            case mCASH: return QString("Milli-Testepays (1 / 1,000)");
-            case uCASH: return QString("Micro-Testepays (1 / 1,000,000)");
+            case PAY: return QString("Testepays");
+            case mPAY: return QString("Milli-Testepays (1 / 1,000)");
+            case uPAY: return QString("Micro-Testepays (1 / 1,000,000)");
             case duffs: return QString("Ten Nano-Testepays (1 / 100,000,000)");
             default: return QString("???");
         }
@@ -94,9 +94,9 @@ qint64 BitcoinUnits::factor(int unit)
 {
     switch(unit)
     {
-    case CASH:  return 100000000;
-    case mCASH: return 100000;
-    case uCASH: return 100;
+    case PAY:  return 100000000;
+    case mPAY: return 100000;
+    case uPAY: return 100;
     case duffs: return 1;
     default:   return 100000000;
     }
@@ -106,9 +106,9 @@ qint64 BitcoinUnits::maxAmount(int unit)
 {
     switch(unit)
     {
-    case CASH:  return Q_INT64_C(210000000);
-    case mCASH: return Q_INT64_C(210000000000);
-    case uCASH: return Q_INT64_C(210000000000000);
+    case PAY:  return Q_INT64_C(210000000);
+    case mPAY: return Q_INT64_C(210000000000);
+    case uPAY: return Q_INT64_C(210000000000000);
     case duffs: return Q_INT64_C(21000000000000000);
     default:   return 0;
     }
@@ -118,9 +118,9 @@ int BitcoinUnits::amountDigits(int unit)
 {
     switch(unit)
     {
-    case CASH: return 8; // 21,000,000 (# digits, without commas)
-    case mCASH: return 11; // 21,000,000,000
-    case uCASH: return 14; // 21,000,000,000,000
+    case PAY: return 8; // 21,000,000 (# digits, without commas)
+    case mPAY: return 11; // 21,000,000,000
+    case uPAY: return 14; // 21,000,000,000,000
     case duffs: return 16; // 2,100,000,000,000,000
     default: return 0;
     }
@@ -130,9 +130,9 @@ int BitcoinUnits::decimals(int unit)
 {
     switch(unit)
     {
-    case CASH: return 8;
-    case mCASH: return 5;
-    case uCASH: return 2;
+    case PAY: return 8;
+    case mPAY: return 5;
+    case uPAY: return 2;
     case duffs: return 0;
     default: return 0;
     }

@@ -30,7 +30,7 @@ class TxViewDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    TxViewDelegate(): QAbstractItemDelegate(), unit(BitcoinUnits::CASH)
+    TxViewDelegate(): QAbstractItemDelegate(), unit(BitcoinUnits::PAY)
     {
 
     }
@@ -227,7 +227,7 @@ void OverviewPage::setWalletModel(WalletModel *model)
         connect(ui->toggleDarksend, SIGNAL(clicked()), this, SLOT(toggleDarksend()));
     }
 
-    // update the display unit, to not use the default ("CASH")
+    // update the display unit, to not use the default ("PAY")
     updateDisplayUnit();
 }
 

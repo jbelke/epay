@@ -1103,13 +1103,13 @@ Adres: %4
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="78"/>
-        <source>Use 2 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>Gebruik 2 verschillende masternodes om tot en met  1000CASH te mixen</translation>
+        <source>Use 2 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>Gebruik 2 verschillende masternodes om tot en met  1000PAY te mixen</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="91"/>
-        <source>Use 8 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>Gebruik 8 verschillende masternodes om tot en met  1000CASH te mixen</translation>
+        <source>Use 8 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>Gebruik 8 verschillende masternodes om tot en met  1000PAY te mixen</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="104"/>
@@ -1118,18 +1118,18 @@ Adres: %4
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="117"/>
-        <source>This option is the quickest and will cost about ~0.025 CASH to anonymize 1000 CASH</source>
-        <translation>Deze optie is het snelst en kost ongeveer ~0.025CASH om 1000CASH te anonimiseren</translation>
+        <source>This option is the quickest and will cost about ~0.025 PAY to anonymize 1000 PAY</source>
+        <translation>Deze optie is het snelst en kost ongeveer ~0.025PAY om 1000PAY te anonimiseren</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="130"/>
-        <source>This option is moderately fast and will cost about 0.05 CASH to anonymize 1000 CASH</source>
-        <translation>Deze optie is relatief snel en zal ongeveer 0.05 CASH kosten om 1000 CASH te anonimiseren </translation>
+        <source>This option is moderately fast and will cost about 0.05 PAY to anonymize 1000 PAY</source>
+        <translation>Deze optie is relatief snel en zal ongeveer 0.05 PAY kosten om 1000 PAY te anonimiseren </translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="156"/>
-        <source>0.1 CASH per 1000 CASH you anonymize.</source>
-        <translation>0.1 CASH per 1000 CASH die je anonimiseert.</translation>
+        <source>0.1 PAY per 1000 PAY you anonymize.</source>
+        <translation>0.1 PAY per 1000 PAY die je anonimiseert.</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="143"/>
@@ -1764,8 +1764,8 @@ Adres: %4
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="349"/>
-        <source>0 CASH</source>
-        <translation>0 CASH</translation>
+        <source>0 PAY</source>
+        <translation>0 PAY</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="356"/>
@@ -1774,8 +1774,8 @@ Adres: %4
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="363"/>
-        <source>0 CASH / 0 Rounds</source>
-        <translation>0 CASH / 0 Rondes</translation>
+        <source>0 PAY / 0 Rounds</source>
+        <translation>0 PAY / 0 Rondes</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="370"/>
@@ -4041,7 +4041,7 @@ for example: alertnotify=echo %%s | mail -s &quot;ePay Alert&quot; admin@foo.com
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="138"/>
-        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 CASH.</source>
+        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 PAY.</source>
         <translation type="unfinished"/>
     </message>
     <message>

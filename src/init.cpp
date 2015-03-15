@@ -1227,8 +1227,8 @@ bool AppInit2(boost::thread_group& threadGroup)
        is convertable to another.
 
        For example:
-       1CASH+1000 == (.1CASH+100)*10
-       10CASH+10000 == (1CASH+1000)*10
+       1PAY+1000 == (.1PAY+100)*10
+       10PAY+10000 == (1PAY+1000)*10
     */
     darkSendDenominations.push_back( (100      * COIN)+100000 );
     darkSendDenominations.push_back( (10       * COIN)+10000 );

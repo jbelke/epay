@@ -1105,13 +1105,13 @@ Adresse: %4</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="78"/>
-        <source>Use 2 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>Benutze 2 separate Masternodes um bis zu 1000 CASH zu mixen</translation>
+        <source>Use 2 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>Benutze 2 separate Masternodes um bis zu 1000 PAY zu mixen</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="91"/>
-        <source>Use 8 separate masternodes to mix funds up to 1000 CASH</source>
-        <translation>Benutze 8 separate Masternodes um bis zu 1000 CASH zu mixen</translation>
+        <source>Use 8 separate masternodes to mix funds up to 1000 PAY</source>
+        <translation>Benutze 8 separate Masternodes um bis zu 1000 PAY zu mixen</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="104"/>
@@ -1120,18 +1120,18 @@ Adresse: %4</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="117"/>
-        <source>This option is the quickest and will cost about ~0.025 CASH to anonymize 1000 CASH</source>
-        <translation>Diese Option ist am Schnellsten und kostet ungefähr 0,025 CASH, um 1000 CASH zu anonymisieren</translation>
+        <source>This option is the quickest and will cost about ~0.025 PAY to anonymize 1000 PAY</source>
+        <translation>Diese Option ist am Schnellsten und kostet ungefähr 0,025 PAY, um 1000 PAY zu anonymisieren</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="130"/>
-        <source>This option is moderately fast and will cost about 0.05 CASH to anonymize 1000 CASH</source>
-        <translation>Diese Option ist einigermaßen schnell und kostet ungefähr 0,05 CASH, um 1000 CASH zu anonymisieren</translation>
+        <source>This option is moderately fast and will cost about 0.05 PAY to anonymize 1000 PAY</source>
+        <translation>Diese Option ist einigermaßen schnell und kostet ungefähr 0,05 PAY, um 1000 PAY zu anonymisieren</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="156"/>
-        <source>0.1 CASH per 1000 CASH you anonymize.</source>
-        <translation>0,1 CASH pro 1000 zu anonymisierende ePay.</translation>
+        <source>0.1 PAY per 1000 PAY you anonymize.</source>
+        <translation>0,1 PAY pro 1000 zu anonymisierende ePay.</translation>
     </message>
     <message>
         <location filename="../forms/darksendconfig.ui" line="143"/>
@@ -1766,8 +1766,8 @@ Adresse: %4</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="349"/>
-        <source>0 CASH</source>
-        <translation>0 CASH</translation>
+        <source>0 PAY</source>
+        <translation>0 PAY</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="356"/>
@@ -1776,8 +1776,8 @@ Adresse: %4</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="363"/>
-        <source>0 CASH / 0 Rounds</source>
-        <translation>0 CASH / 0 Runden</translation>
+        <source>0 PAY / 0 Rounds</source>
+        <translation>0 PAY / 0 Runden</translation>
     </message>
     <message>
         <location filename="../forms/overviewpage.ui" line="370"/>
@@ -4055,8 +4055,8 @@ zum Beispiel: alertnotify=echo %%s | mail -s \&quot;ePay Alert\&quot; admin@foo.
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="138"/>
-        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 CASH.</source>
-        <translation>Für diese Transaktion konnten nicht genug nicht mit Darksend gestückelte Beträge gefunden werden, die ungleich 1000 CASH sind.</translation>
+        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 1000 PAY.</source>
+        <translation>Für diese Transaktion konnten nicht genug nicht mit Darksend gestückelte Beträge gefunden werden, die ungleich 1000 PAY sind.</translation>
     </message>
     <message>
         <location filename="../bitcoinstrings.cpp" line="141"/>
