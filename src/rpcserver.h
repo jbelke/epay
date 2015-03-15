@@ -63,7 +63,7 @@ public:
 };
 
 /**
- * Ecash RPC command dispatcher.
+ * ePay RPC command dispatcher.
  */
 class CRPCTable
 {

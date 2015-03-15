@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Darkcoin developers
-// Copyright (c) 2015- The Ecash developers
+// Copyright (c) 2015- The ePay developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -76,11 +76,11 @@ void OptionsModel::Init()
     if (!settings.contains("nDarksendRounds"))
         settings.setValue("nDarksendRounds", 2);
 
-    if (!settings.contains("nAnonymizeEcashAmount"))
-        settings.setValue("nAnonymizeEcashAmount", 1000);
+    if (!settings.contains("nAnonymizeePayAmount"))
+        settings.setValue("nAnonymizeePayAmount", 1000);
 
     nDarksendRounds = settings.value("nDarksendRounds").toLongLong();
-    nAnonymizeEcashAmount = settings.value("nAnonymizeEcashAmount").toLongLong();
+    nAnonymizeePayAmount = settings.value("nAnonymizeePayAmount").toLongLong();
 
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
@@ -146,8 +146,8 @@ void OptionsModel::Init()
 
     if (settings.contains("nDarksendRounds"))
         SoftSetArg("-darksendrounds", settings.value("nDarksendRounds").toString().toStdString());
-    if (settings.contains("nAnonymizeEcashAmount"))
-        SoftSetArg("-anonymizeecashamount", settings.value("nAnonymizeEcashAmount").toString().toStdString());
+    if (settings.contains("nAnonymizeePayAmount"))
+        SoftSetArg("-anonymizeepayamount", settings.value("nAnonymizeePayAmount").toString().toStdString());
 
     language = settings.value("language").toString();
 }
@@ -235,8 +235,8 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             return settings.value("nThreadsScriptVerif");
         case DarksendRounds:
             return QVariant(nDarksendRounds);
-        case AnonymizeEcashAmount:
-            return QVariant(nAnonymizeEcashAmount);
+        case AnonymizeePayAmount:
+            return QVariant(nAnonymizeePayAmount);
         default:
             return QVariant();
         }
@@ -348,10 +348,10 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             settings.setValue("nDarksendRounds", nDarksendRounds);
             emit darksendRoundsChanged(nDarksendRounds);
             break;
-        case AnonymizeEcashAmount:
-            nAnonymizeEcashAmount = value.toInt();
-            settings.setValue("nAnonymizeEcashAmount", nAnonymizeEcashAmount);
-            emit anonymizeEcashAmountChanged(nAnonymizeEcashAmount);
+        case AnonymizeePayAmount:
+            nAnonymizeePayAmount = value.toInt();
+            settings.setValue("nAnonymizeePayAmount", nAnonymizeePayAmount);
+            emit anonymizeePayAmountChanged(nAnonymizeePayAmount);
             break;
         case CoinControlFeatures:
             fCoinControlFeatures = value.toBool();

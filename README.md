@@ -1,39 +1,39 @@
-Ecash Core staging tree 0.11
+ePay Core staging tree 0.11
 ===============================
 
-http://www.ecash.io
+http://www.epay.io
 
 Copyright (c) 2009-2015 Bitcoin Core Developers
 
 Copyright (c) 2014-2015 Darkcoin Core Developers
 
-Copyright (c) 2015- Ecash Core Developers
+Copyright (c) 2015- ePay Core Developers
 
 
-What is Ecash?
+What is ePay?
 ----------------
 
-Ecash is an experimental new digital currency that enables anonymous, instant
-payments to anyone, anywhere in the world. Ecash uses peer-to-peer technology
+ePay is an experimental new digital currency that enables anonymous, instant
+payments to anyone, anywhere in the world. ePay uses peer-to-peer technology
 to operate with no central authority: managing transactions and issuing money
-are carried out collectively by the network. Ecash Core is the name of open
+are carried out collectively by the network. ePay Core is the name of open
 source software which enables the use of this currency.
 
 For more information, as well as an immediately useable, binary version of
-the Ecash Core software, see http://www.ecash.io/downloads.
+the ePay Core software, see http://www.epay.io/downloads.
 
 
 License
 -------
 
-Ecash Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
+ePay Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
 information or see http://opensource.org/licenses/MIT.
 
 
 Building process
 -----------------
 
-**compiling Ecash from git**
+**compiling ePay from git**
 
 Use the autogen script to prepare the build environment.
 
@@ -44,7 +44,7 @@ Use the autogen script to prepare the build environment.
 **precompiled binaries**
 
 Precompiled binaries are available at github, see
-https://github.com/ecashproject/ecash-binaries
+https://github.com/epayproject/epay-binaries
 
 Always verify the signatures and checksums.
 
@@ -70,7 +70,7 @@ to see it.
 
 **testnet and regtest modes**
 
-Run with the -testnet option to run with "play ecashs" on the test network, if you
+Run with the -testnet option to run with "play epays" on the test network, if you
 are testing multi-machine code that needs to operate across the internet.
 
 If you are testing something that can run on one machine, run with the -regtest option.
@@ -79,7 +79,7 @@ that run in -regtest mode.
 
 **DEBUG_LOCKORDER**
 
-Ecash Core is a multithreaded application, and deadlocks or other multithreading bugs
+ePay Core is a multithreaded application, and deadlocks or other multithreading bugs
 can be very difficult to track down. Compiling with -DDEBUG_LOCKORDER (configure
 CXXFLAGS="-DDEBUG_LOCKORDER -g") inserts run-time checks to keep track of what locks
 are held, and adds warning to the debug.log file if inconsistencies are detected.

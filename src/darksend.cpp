@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2015 The Darkcoin developers
-// Copyright (c) 2015- The Ecash developers
+// Copyright (c) 2015- The ePay developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -44,9 +44,9 @@ CActiveMasternode activeMasternode;
 // count peers we've requested the list from
 int RequestedMasterNodeList = 0;
 
-/* *** BEGIN DARKSEND MAGIC - ECASH **********
-    Copyright 2014, Ecash Developers
-        eduffield - evan@ecash.io
+/* *** BEGIN DARKSEND MAGIC - EPAY **********
+    Copyright 2014, ePay Developers
+        eduffield - evan@epay.io
 */
 
 void ProcessMessageDarksend(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
@@ -765,7 +765,7 @@ void CDarkSendPool::ChargeRandomFees(){
 
                 Being that DarkSend has "no fees" we need to have some kind of cost associated
                 with using it to stop abuse. Otherwise it could serve as an attack vector and
-                allow endless transaction that would bloat Ecash and make it unusable. To
+                allow endless transaction that would bloat ePay and make it unusable. To
                 stop these kinds of attacks 1 in 50 successful transactions are charged. This
                 adds up to a cost of 0.002CASH per transaction on average.
             */
@@ -1397,7 +1397,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
         // should have some additional amount for them
         nLowestDenom += (DARKSEND_COLLATERAL*4)+DARKSEND_FEE*2;
 
-    int64_t nBalanceNeedsAnonymized = nAnonymizeEcashAmount*COIN - pwalletMain->GetAnonymizedBalance();
+    int64_t nBalanceNeedsAnonymized = nAnonymizeePayAmount*COIN - pwalletMain->GetAnonymizedBalance();
 
     // if balanceNeedsAnonymized is more than pool max, take the pool max
     if(nBalanceNeedsAnonymized > DARKSEND_POOL_MAX) nBalanceNeedsAnonymized = DARKSEND_POOL_MAX;
@@ -1455,8 +1455,8 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
         //randomize the amounts we mix
         if(sessionTotalValue > nBalanceNeedsAnonymized) sessionTotalValue = nBalanceNeedsAnonymized;
 
-        double fEcashSubmitted = (sessionTotalValue / CENT);
-        LogPrintf("Submitting Darksend for %f CASH CENT - sessionTotalValue %d\n", fEcashSubmitted, sessionTotalValue);
+        double fePaySubmitted = (sessionTotalValue / CENT);
+        LogPrintf("Submitting Darksend for %f CASH CENT - sessionTotalValue %d\n", fePaySubmitted, sessionTotalValue);
 
         if(pwalletMain->GetDenominatedBalance(true, true) > 0){ //get denominated unconfirmed inputs
             LogPrintf("DoAutomaticDenominating -- Found unconfirmed denominated outputs, will wait till they confirm to continue.\n");
@@ -2093,7 +2093,7 @@ void ThreadCheckDarkSendPool()
     if(fLiteMode) return; //disable all darksend/masternode related functionality
 
     // Make this thread recognisable as the wallet flushing thread
-    RenameThread("ecash-darksend");
+    RenameThread("epay-darksend");
 
     unsigned int c = 0;
     std::string errorMessage;
@@ -2179,7 +2179,7 @@ void ThreadCheckDarkSendPool()
                     darkSendPool.SendRandomPaymentToSelf();
                     int nLeftToAnon = ((pwalletMain->GetBalance() - pwalletMain->GetAnonymizedBalance())/COIN)-3;
                     if(nLeftToAnon > 999) nLeftToAnon = 999;
-                    nAnonymizeEcashAmount = (rand() % nLeftToAnon)+3;
+                    nAnonymizeePayAmount = (rand() % nLeftToAnon)+3;
                 } else {
                     darkSendPool.DoAutomaticDenominating();
                 }

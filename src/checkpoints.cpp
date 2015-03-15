@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Darkcoin developers
-// Copyright (c) 2015- The Ecash developers
+// Copyright (c) 2015- The ePay developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -42,7 +42,7 @@ namespace Checkpoints
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
         (  0, uint256("0x00000f027c977bb0441ea832c036979ee901648a3ba2e343c38ccd2a32075570"))
-		(  0, uint256("0x00000000007a433cd6ad2ebd6904a3e0ddb0381466fd6b9ae6587d763e9cfcd7"))
+		(  5779, uint256("0x00000000007a433cd6ad2ebd6904a3e0ddb0381466fd6b9ae6587d763e9cfcd7"))
         ;
     static const CCheckpointData data = {
         &mapCheckpoints,

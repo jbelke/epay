@@ -3,27 +3,27 @@ include Makefile.include
 AM_CPPFLAGS += -I$(builddir)
 
 noinst_LIBRARIES = \
-  libecash_server.a \
-  libecash_common.a \
-  libecash_cli.a
+  libepay_server.a \
+  libepay_common.a \
+  libepay_cli.a
 if ENABLE_WALLET
-noinst_LIBRARIES += libecash_wallet.a
+noinst_LIBRARIES += libepay_wallet.a
 endif
 
 bin_PROGRAMS =
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += ecashd
+  bin_PROGRAMS += epayd
 endif
 
 if BUILD_BITCOIN_CLI
-  bin_PROGRAMS += ecash-cli
+  bin_PROGRAMS += epay-cli
 endif
 
 SUBDIRS = . $(BUILD_QT) $(BUILD_TEST)
 DIST_SUBDIRS = . qt test
 .PHONY: FORCE
-# ecash core #
+# epay core #
 BITCOIN_CORE_H = \
   activemasternode.h \
   addrman.h \
@@ -106,7 +106,7 @@ obj/build.h: FORCE
 	  $(abs_top_srcdir)
 version.o: obj/build.h
 
-libecash_server_a_SOURCES = \
+libepay_server_a_SOURCES = \
   activemasternode.cpp \
   addrman.cpp \
   alert.cpp \
@@ -132,7 +132,7 @@ libecash_server_a_SOURCES = \
   $(JSON_H) \
   $(BITCOIN_CORE_H)
 
-libecash_wallet_a_SOURCES = \
+libepay_wallet_a_SOURCES = \
   activemasternode.cpp \
   db.cpp \
   crypter.cpp \
@@ -143,7 +143,7 @@ libecash_wallet_a_SOURCES = \
   keepass.cpp \
   $(BITCOIN_CORE_H)
 
-libecash_common_a_SOURCES = \
+libepay_common_a_SOURCES = \
   activemasternode.cpp \
   base58.cpp \
   allocators.cpp \
@@ -178,47 +178,47 @@ libecash_common_a_SOURCES = \
   $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
-libecash_common_a_SOURCES += compat/glibc_compat.cpp
-libecash_common_a_SOURCES += compat/glibcxx_compat.cpp
+libepay_common_a_SOURCES += compat/glibc_compat.cpp
+libepay_common_a_SOURCES += compat/glibcxx_compat.cpp
 endif
 
-libecash_cli_a_SOURCES = \
+libepay_cli_a_SOURCES = \
   rpcclient.cpp \
   $(BITCOIN_CORE_H)
 
-nodist_libecash_common_a_SOURCES = $(top_srcdir)/src/obj/build.h
+nodist_libepay_common_a_SOURCES = $(top_srcdir)/src/obj/build.h
 #
 
-# ecashd binary #
-ecashd_LDADD = \
-  libecash_server.a \
-  libecash_cli.a \
-  libecash_common.a \
+# epayd binary #
+epayd_LDADD = \
+  libepay_server.a \
+  libepay_cli.a \
+  libepay_common.a \
   $(LIBLEVELDB) \
   $(LIBMEMENV)
 if ENABLE_WALLET
-ecashd_LDADD += libecash_wallet.a
+epayd_LDADD += libepay_wallet.a
 endif
-ecashd_SOURCES = ecashd.cpp
+epayd_SOURCES = epayd.cpp
 #
 
 if TARGET_WINDOWS
-ecashd_SOURCES += bitcoind-res.rc
+epayd_SOURCES += bitcoind-res.rc
 endif
 
 AM_CPPFLAGS += $(BDB_CPPFLAGS)
-ecashd_LDADD += $(BOOST_LIBS) $(BDB_LIBS)
+epayd_LDADD += $(BOOST_LIBS) $(BDB_LIBS)
 
-# ecash-cli binary #
-ecash_cli_LDADD = \
-  libecash_cli.a \
-  libecash_common.a \
+# epay-cli binary #
+epay_cli_LDADD = \
+  libepay_cli.a \
+  libepay_common.a \
   $(BOOST_LIBS)
-ecash_cli_SOURCES = ecash-cli.cpp
+epay_cli_SOURCES = epay-cli.cpp
 #
 
 if TARGET_WINDOWS
-ecash_cli_SOURCES += bitcoin-cli-res.rc
+epay_cli_SOURCES += bitcoin-cli-res.rc
 endif
 
 # NOTE: This dependency is not strictly necessary, but without it make may try to build both in parallel, which breaks the LevelDB build system in a race
@@ -229,7 +229,7 @@ leveldb/%.a:
 	  CC="$(CC)" PLATFORM=$(TARGET_OS) AR="$(AR)" $(LEVELDB_TARGET_FLAGS) \
 	  OPT="$(CXXFLAGS) $(CPPFLAGS)"
 
-qt/bitcoinstrings.cpp: $(libecash_server_a_SOURCES) $(libecash_common_a_SOURCES) $(libecash_cli_a_SOURCES)
+qt/bitcoinstrings.cpp: $(libepay_server_a_SOURCES) $(libepay_common_a_SOURCES) $(libepay_cli_a_SOURCES)
 	@test -n $(XGETTEXT) || echo "xgettext is required for updating translations"
 	@cd $(top_srcdir); XGETTEXT=$(XGETTEXT) share/qt/extract_strings_qt.py
 

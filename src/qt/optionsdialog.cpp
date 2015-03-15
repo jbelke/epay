@@ -193,7 +193,7 @@ void OptionsDialog::setMapper()
 
     /* Darksend Rounds */
     mapper->addMapping(ui->darksendRounds, OptionsModel::DarksendRounds);
-    mapper->addMapping(ui->anonymizeEcash, OptionsModel::AnonymizeEcashAmount);
+    mapper->addMapping(ui->anonymizeePay, OptionsModel::AnonymizeePayAmount);
 
 }
 
